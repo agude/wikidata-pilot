@@ -1,0 +1,14 @@
+# Thin caller: runs the full CI pipeline on every push and pull request.
+# Keeping the jobs in ci.yml (workflow_call) means release.yml runs the exact
+# same pipeline rather than a copy that can drift.
+name: Tests
+
+on: [push, pull_request]
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml

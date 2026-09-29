@@ -1,0 +1,301 @@
+"""Offline tests for evidence validation, matching, plans, and export."""
+
+from datetime import date
+from pathlib import Path
+from typing import Any, Literal
+
+import pytest
+from pydantic import HttpUrl
+
+from wikidata_pilot import cli
+from wikidata_pilot.models import Case, Claim, Entity, Resolution, Source
+from wikidata_pilot.wikidata import WikidataClient
+from wikidata_pilot.workflow import (
+    _quickstatements_date,
+    deferred_claims,
+    export_case,
+    live_snapshot,
+    match_case,
+    render_plan,
+    validate_case,
+)
+
+
+def source(
+    verification: Literal["verified", "illustrative_unverified"] = "verified",
+) -> Source:
+    return Source(
+        id="book",
+        url=HttpUrl("https://example.org/book"),
+        retrieved=date(2026, 9, 29),
+        excerpt="page 2",
+        verification=verification,
+    )
+
+
+def case() -> Case:
+    return Case(
+        title="Test",
+        sources=[source()],
+        entities=[
+            Entity(
+                key="story",
+                kind="work",
+                label="Story",
+                description="short story",
+                title="Story",
+                resolution=Resolution(status="existing", qid="Q1", reason="checked"),
+                claims=[
+                    Claim(
+                        id="collection",
+                        property="P1433",
+                        datatype="item",
+                        value="Q2",
+                        sources=["book"],
+                    )
+                ],
+            ),
+        ],
+    )
+
+
+def test_case_checks_evidence_and_unresolved_state() -> None:
+    example = case()
+    example.sources[0].verification = "illustrative_unverified"
+    example.entities[0].resolution = Resolution()
+    messages = validate_case(example)
+    assert any("illustrative_unverified" in message for message in messages)
+    assert any("unresolved" in message for message in messages)
+
+
+def test_missing_source_fails_and_unsafe_text_is_rejected() -> None:
+    example = case()
+    example.entities[0].claims[0].sources = ["missing"]
+    assert any("missing or no source" in message for message in validate_case(example))
+    example.entities[0].claims[0] = Claim(
+        id="unsafe",
+        property="P1476",
+        datatype="string",
+        value='A "title"',
+        sources=["book"],
+    )
+    assert any("unsafe" in message for message in validate_case(example))
+
+
+def test_local_dependency_blocks_relationship_until_target_is_resolved() -> None:
+    example = case()
+    example.entities.append(
+        Entity(
+            key="collection",
+            kind="collection",
+            label="Collection",
+            description="anthology",
+            resolution=Resolution(status="create", reason="searched ISBN and title"),
+        )
+    )
+    example.entities[0].claims[0].value = "collection"
+    assert validate_case(example) == []
+    output = export_case(example)
+    assert "CREATE" in output
+    assert deferred_claims(example) == ["story.collection -> collection"]
+
+
+def test_matching_preserves_ambiguity_and_identifier_search_first() -> None:
+    example = Case(
+        title="Test",
+        sources=[source()],
+        entities=[
+            Entity(
+                key="story",
+                kind="work",
+                label="Story",
+                description="work",
+                title="Story",
+                identifiers={"P212": "9780000000000"},
+            )
+        ],
+    )
+
+    class Search:
+        def __init__(self) -> None:
+            self.queries: list[str] = []
+
+        def search(self, query: str) -> list[dict[str, str]]:
+            self.queries.append(query)
+            return [{"id": "Q1", "label": "Story"}]
+
+        def search_identifier(self, property_id: str, identifier: str) -> list[dict[str, str]]:
+            self.queries.append(f"{property_id}:{identifier}")
+            return [{"id": "Q1", "label": "Story"}]
+
+    client = Search()
+    matched, report = match_case(example, client)
+    assert client.queries == ["P212:9780000000000", "Story"]
+    assert matched.entities[0].resolution.status == "unresolved"
+    candidates = report[0]["candidates"]
+    assert isinstance(candidates, list)
+    assert len(candidates) == 1
+
+
+def test_plan_includes_current_and_proposed_labels() -> None:
+    output = render_plan(case())
+    assert "live snapshot not captured" in output
+    assert "Proposed claim" in output
+    assert "Q1" in output
+
+
+def test_export_blocks_unverified_source() -> None:
+    example = case()
+    example.sources[0].verification = "illustrative_unverified"
+    with pytest.raises(ValueError, match="unverified"):
+        export_case(example)
+
+
+def test_export_renders_creation_claims_dates_text_and_references() -> None:
+    example = Case(
+        title="Export",
+        sources=[source()],
+        entities=[
+            Entity(
+                key="book",
+                kind="work",
+                label="Book",
+                description="written work",
+                resolution=Resolution(status="create", reason="checked source and searches"),
+                claims=[
+                    Claim(
+                        id="title",
+                        property="P1476",
+                        datatype="monolingualtext",
+                        value="Title",
+                        language="en",
+                        sources=["book"],
+                    ),
+                    Claim(
+                        id="date",
+                        property="P577",
+                        datatype="time",
+                        value="1982",
+                        precision="year",
+                        sources=["book"],
+                    ),
+                    Claim(
+                        id="id",
+                        property="P212",
+                        datatype="external-id",
+                        value="9780000000000",
+                        sources=["book"],
+                    ),
+                ],
+            )
+        ],
+    )
+    output = export_case(example)
+    assert output.startswith('CREATE\nLAST|Len|"Book"')
+    assert 'P1476|en:"Title"' in output
+    assert "/9|S854|" in output
+    assert 'P212|"9780000000000"' in output
+
+
+def test_time_dates_and_snapshot_rendering() -> None:
+    assert _quickstatements_date("1982", "year").endswith("/9")
+    assert _quickstatements_date("1982-03", "month").endswith("/10")
+    with pytest.raises(ValueError, match="Invalid time"):
+        _quickstatements_date("1982-03-01-extra", "day")
+    snapshot: dict[str, object] = {
+        "story": {
+            "entities": {
+                "Q1": {"claims": {"P1433": [{"mainsnak": {"datavalue": {"value": {"id": "Q2"}}}}]}}
+            }
+        }
+    }
+    assert "{'id': 'Q2'}" in render_plan(case(), snapshot)
+
+
+def test_live_snapshot_calls_only_resolved_items() -> None:
+    class Reader:
+        def __init__(self) -> None:
+            self.qids: list[str] = []
+
+        def inspect(self, qid: str) -> dict[str, object]:
+            self.qids.append(qid)
+            return {"qid": qid}
+
+    reader = Reader()
+    assert live_snapshot(case(), reader) == {"story": {"qid": "Q1"}}
+    assert reader.qids == ["Q1"]
+
+
+def test_wikidata_client_handles_search_and_errors() -> None:
+    class Response:
+        def __init__(self, payload: object) -> None:
+            self.payload = payload
+
+        def raise_for_status(self) -> None:
+            return None
+
+        def json(self) -> object:
+            return self.payload
+
+    class Transport:
+        def get(self, url: str, **kwargs: object) -> Response:
+            if "sparql" in url:
+                return Response(
+                    {
+                        "results": {
+                            "bindings": [
+                                {
+                                    "item": {"value": "http://www.wikidata.org/entity/Q9"},
+                                    "itemLabel": {"value": "Nine"},
+                                }
+                            ]
+                        }
+                    }
+                )
+            return Response({"search": [{"id": "Q3", "label": "Three"}]})
+
+        def close(self) -> None:
+            return None
+
+    client = WikidataClient(Transport())  # type: ignore[arg-type]
+    assert client.search("Three")[0]["id"] == "Q3"
+    assert client.search_identifier("P212", "9780000000000")[0]["id"] == "Q9"
+    client.close()
+
+
+def test_cli_commands_with_offline_client(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    case_path = tmp_path / "case.json"
+    assert cli.main(["init", str(case_path)]) == 0
+    assert cli.main(["validate", str(case_path)]) == 1
+
+    ready = case()
+    case_path.write_text(ready.model_dump_json(), encoding="utf-8")
+
+    class OfflineClient:
+        def __enter__(self) -> Any:
+            return self
+
+        def __exit__(self, *_: object) -> None:
+            return None
+
+        def inspect(self, qid: str) -> dict[str, object]:
+            return {"entities": {qid: {"claims": {}}}}
+
+        def search_identifier(self, property_id: str, identifier: str) -> list[dict[str, str]]:
+            return []
+
+        def search(self, query: str) -> list[dict[str, str]]:
+            return []
+
+    monkeypatch.setattr(cli, "WikidataClient", OfflineClient)
+    assert cli.main(["inspect", "Q1"]) == 0
+    assert cli.main(["match", str(case_path)]) == 0
+    assert cli.main(["plan", str(case_path), "--snapshot"]) == 0
+    assert case_path.with_suffix(".plan.md").exists()
+    output = tmp_path / "out.qs"
+    assert cli.main(["export", str(case_path), "--output", str(output)]) == 0
+    assert output.read_text(encoding="utf-8")
+    assert cli.main(["validate", str(tmp_path / "missing.json")]) == 2
+    assert "error:" in capsys.readouterr().err

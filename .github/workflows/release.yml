@@ -1,0 +1,38 @@
+# Publishes to PyPI when a GitHub release is published.
+#
+# The full CI pipeline runs first and gates the publish: PyPI uploads cannot
+# be undone, so nothing ships that the matrix has not proven.
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [ci]
+    name: Build and publish to PyPI
+    permissions:
+      # Trusted publishing: no API token stored in the repo.
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v9.0.0
+
+      - name: Set up just
+        uses: extractions/setup-just@v4
+
+      - name: Verify release tag
+        run: just verify-release
+
+      - name: Build
+        run: just build
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
