@@ -30,7 +30,7 @@ Use only explicit, supported claim datatypes. Never submit QuickStatements autom
 1. Read the README case format and initialize a case with the CLI.
 2. Use browsing tools to inspect source pages. Record actual retrieval dates, supporting excerpts, locators, and claim-to-source links. Mark a source verified only after checking the material and each linked claim. Model memory and search snippets are insufficient evidence.
 3. Search unresolved entities with `match`. Inspect candidate items, alternate titles, authors, and external identifiers before recording an identity decision. Keep uncertain matches unresolved and explain conflicts in the case.
-4. Generate a plan with live snapshots. Review all additions, date precision, qualifiers, work/edition scope, and source support before exporting.
+4. Use `cache --find` for local QID/PID metadata lookup and `cache --case CASE` to fetch missing metadata. Keep `data/wikidata_ids.json` checked in. Names can match multiple IDs; metadata is not evidence or an identity decision. Use `--refresh` explicitly when metadata needs updating. Generate a plan with live snapshots. Review all additions, date precision, qualifiers, work/edition scope, and source support before exporting.
 5. Export the reviewed case. The user submits the batch in QuickStatements. Record returned QIDs and retain the execution report before generating a subsequent batch.
 
 Use `uv run wikidata-pilot` for every CLI invocation. Edit the structured case; do not hand-edit generated commands to bypass validation.

@@ -8,6 +8,7 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
+from .cache import IdCache
 from .models import Candidate, Case, parse_time
 
 SAFE_QS_TEXT = re.compile(r'^[^\x00-\x1f\x7f|"<>]*$')
@@ -104,7 +105,9 @@ def _record_candidate(
     candidates[qid][2].append(query)
 
 
-def render_plan(case: Case, snapshot: dict[str, object] | None = None) -> str:
+def render_plan(
+    case: Case, snapshot: dict[str, object] | None = None, cache: IdCache | None = None
+) -> str:
     """Render before/after review with proposals and unresolved entities."""
     rows = [
         f"# Review plan: {case.title}",
@@ -114,6 +117,20 @@ def render_plan(case: Case, snapshot: dict[str, object] | None = None) -> str:
         "## Entities",
         "",
     ]
+    display = cache.display if cache else str
+    local_items = {entity.key: entity for entity in case.entities}
+
+    def item_value(value: str) -> str:
+        target = local_items.get(value)
+        if target:
+            if target.resolution.qid:
+                value = target.resolution.qid
+            elif target.resolution.status == "create":
+                value += " (deferred until created)"
+            else:
+                value += " (unresolved)"
+        return display(value)
+
     for entity in case.entities:
         current = (
             entity.resolution.qid
@@ -124,7 +141,7 @@ def render_plan(case: Case, snapshot: dict[str, object] | None = None) -> str:
             [
                 f"### {entity.key}: {entity.label}",
                 "",
-                f"Current item: {current}",
+                f"Current item: {display(current) if current else current}",
                 f"Decision: {entity.resolution.status}; {entity.resolution.reason or 'no decision recorded'}",
                 "",
                 "| Property | Current claim snapshot | Proposed claim | Evidence |",
@@ -135,21 +152,14 @@ def render_plan(case: Case, snapshot: dict[str, object] | None = None) -> str:
             evidence = ", ".join(claim.sources)
             before = "(live snapshot not captured)"
             if snapshot and entity.key in snapshot:
-                before = _snapshot_claims(snapshot[entity.key], claim.property)
+                before = _snapshot_claims(snapshot[entity.key], claim.property, cache)
             proposed = claim.value
             if claim.datatype == "item":
-                local_target = next(
-                    (item for item in case.entities if item.key == claim.value), None
-                )
-                if local_target:
-                    proposed = local_target.resolution.qid or (
-                        f"{claim.value} (deferred until created)"
-                        if local_target.resolution.status == "create"
-                        else f"{claim.value} (unresolved)"
-                    )
+                proposed = item_value(proposed)
             if claim.qualifiers:
                 qualifier_text = "; ".join(
-                    f"{item.property}={item.value}" for item in claim.qualifiers
+                    f"{display(item.property)}={item_value(item.value) if item.datatype == 'item' else item.value}"
+                    for item in claim.qualifiers
                 )
                 proposed += f" (qualifiers: {qualifier_text})"
             if claim.language:
@@ -157,7 +167,7 @@ def render_plan(case: Case, snapshot: dict[str, object] | None = None) -> str:
             if claim.precision:
                 proposed += f" ({claim.precision} precision)"
             rows.append(
-                f"| {claim.property} | {_table_text(before)} | {_table_text(proposed)} | {evidence} |"
+                f"| {_table_text(display(claim.property))} | {_table_text(before)} | {_table_text(proposed)} | {evidence} |"
             )
         if not entity.claims:
             rows.append("| — | — | no claims proposed | — |")
@@ -182,7 +192,7 @@ def _table_text(value: str) -> str:
     return value.replace("|", "&#124;").replace("\n", "<br>").replace("\r", "")
 
 
-def _snapshot_claims(payload: object, property_id: str) -> str:
+def _snapshot_claims(payload: object, property_id: str, cache: IdCache | None = None) -> str:
     """Summarize one property's current values from the item API response."""
     if not isinstance(payload, dict):
         return "item unavailable"
@@ -200,7 +210,11 @@ def _snapshot_claims(payload: object, property_id: str) -> str:
     if isinstance(statements, list):
         for statement in statements:
             try:
-                values.append(str(statement["mainsnak"]["datavalue"]["value"]))
+                value = statement["mainsnak"]["datavalue"]["value"]
+                if cache and isinstance(value, dict) and isinstance(value.get("id"), str):
+                    values.append(cache.display(value["id"]))
+                else:
+                    values.append(str(value))
             except (KeyError, TypeError):
                 continue
     return "; ".join(values) if values else "no current value"

@@ -11,6 +11,7 @@ from pathlib import Path
 import httpx
 from pydantic import ValidationError
 
+from .cache import DEFAULT_CACHE, IdCache, case_ids
 from .models import load_case, save_case
 from .wikidata import WikidataClient
 from .workflow import (
@@ -107,6 +108,13 @@ def parser() -> argparse.ArgumentParser:
         "--snapshot", action="store_true", help="fetch current claims for resolved QIDs"
     )
     plan.add_argument("--output", type=Path, help="Markdown path; defaults beside case")
+    plan.add_argument("--cache", type=Path, default=DEFAULT_CACHE)
+    cache = sub.add_parser("cache", help="read or update checked-in ID metadata")
+    cache.add_argument("ids", nargs="*", help="QIDs and PIDs to fetch if missing")
+    cache.add_argument("--case", type=Path, help="also collect IDs from a case")
+    cache.add_argument("--find", help="find all exact label or alias matches locally")
+    cache.add_argument("--refresh", action="store_true", help="refetch requested IDs")
+    cache.add_argument("--file", type=Path, default=DEFAULT_CACHE)
     export = sub.add_parser("export", help="write staged QuickStatements file")
     export.add_argument("case", type=Path)
     export.add_argument("--output", type=Path, required=True)
@@ -121,6 +129,43 @@ def main(argv: Sequence[str] | None = None) -> int:
             with args.path.open("x", encoding="utf-8") as output:
                 output.write(json.dumps(SAMPLE, indent=2) + "\n")
             print(f"Created illustrative case: {args.path}")
+        elif args.command == "cache":
+            cache = IdCache(args.file)
+            if args.find is not None:
+                if args.ids or args.case or args.refresh:
+                    raise ValueError("--find cannot be combined with update arguments")
+                print(
+                    json.dumps(
+                        {
+                            key: entry.model_dump(mode="json")
+                            for key, entry in cache.find(args.find).items()
+                        },
+                        indent=2,
+                        ensure_ascii=False,
+                    )
+                )
+            else:
+                ids = set(args.ids)
+                if args.case:
+                    if args.case.resolve() == args.file.resolve():
+                        raise ValueError("Cache must be distinct from the input case")
+                    ids.update(case_ids(load_case(args.case)))
+                if not ids:
+                    raise ValueError("Supply IDs, --case, or --find")
+                with WikidataClient() as client:
+                    count = cache.update(ids, client, refresh=args.refresh)
+                print(f"Updated {count} entries in {args.file}")
+                if args.ids:
+                    print(
+                        json.dumps(
+                            {
+                                key: cache.entries[key].model_dump(mode="json")
+                                for key in sorted(set(args.ids))
+                            },
+                            indent=2,
+                            ensure_ascii=False,
+                        )
+                    )
         elif args.command == "inspect":
             with WikidataClient() as client:
                 print(json.dumps(client.inspect(args.qid), indent=2, ensure_ascii=False))
@@ -147,10 +192,13 @@ def main(argv: Sequence[str] | None = None) -> int:
             if (
                 args.case.resolve() in {plan_path.resolve(), json_path.resolve()}
                 or plan_path == json_path
+                or args.cache.resolve() in {plan_path.resolve(), json_path.resolve()}
             ):
-                raise ValueError("Plan outputs must be distinct from the input case and each other")
+                raise ValueError(
+                    "Plan outputs must be distinct from the input case, cache, and each other"
+                )
             plan_path.parent.mkdir(parents=True, exist_ok=True)
-            plan_path.write_text(render_plan(case, snapshot), encoding="utf-8")
+            plan_path.write_text(render_plan(case, snapshot, IdCache(args.cache)), encoding="utf-8")
             write_proposal_json(json_path, case, snapshot)
             print(f"Wrote {plan_path} and {json_path}")
         elif args.command == "export":

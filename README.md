@@ -56,6 +56,27 @@ Entity kinds are `work`, `collection`, `edition`, and `person`. Item values can 
 
 Claims and qualifiers use explicit datatype sets. Claims require one or more source IDs. Sources default to `illustrative_unverified`; change them to `verified` only after checking the cited material. Export supports item, string, external identifier, date with year/month/day precision, and monolingual text claims. It preserves qualifiers and attaches source URL and retrieval date reference snaks. It blocks unverified sources, unresolved entities, missing evidence, and unsafe values containing newlines, pipes, quotes, or angle brackets.
 
+## ID metadata cache
+
+`data/wikidata_ids.json` is a checked-in dictionary keyed by QID or PID. Each entry contains an English label, description, aliases, property datatype (when applicable), and retrieval date. The Python wrapper is `IdCache` in `wikidata_pilot.cache`.
+
+```sh
+# Read every local label or alias match; no network request.
+uv run wikidata-pilot cache --find "Keith Laumer"
+# Fetch only missing IDs, in batches of up to 50.
+uv run wikidata-pilot cache P50 Q724395
+uv run wikidata-pilot cache --case bolo.json
+# Explicitly refresh the requested IDs.
+uv run wikidata-pilot cache --case bolo.json --refresh
+uv run wikidata-pilot plan bolo.json --snapshot
+```
+
+Plans load cached labels automatically and retain the IDs, for example `author (P50)` and `Keith Laumer (Q724395)`. Missing metadata falls back to the ID. Planning does not update the cache; run `cache --case` after adding IDs to a case. Current claim snapshots are always fetched separately with `--snapshot`.
+
+Name lookup returns all exact, case-insensitive label and alias matches. A cached name is a search aid, not an identity decision or evidence for a claim. Cache updates stop on missing or redirected IDs and leave the file unchanged on failure. Inspect redirected IDs before updating the case. Review and commit JSON diffs to share metadata between agent sessions.
+
+The default cache path is relative to the working directory. Run from the repository root, or supply `cache --file PATH` and `plan --cache PATH`. Offline planning only reads that file.
+
 ## Staged creation
 
 When a case contains several new entities that refer to one another, export creates each new entity’s label, description, and claims whose targets already resolve. Relationship claims to another new entity are listed as deferred. Submit the first `.qs` batch manually, copy each returned QID into that entity’s resolution as `existing` with a reason, then run validation, planning, and export again. The resolved QID is reused; the tool does not create that entity again. Review each generated batch before submitting it.

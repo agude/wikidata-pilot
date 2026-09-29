@@ -1,0 +1,402 @@
+{
+  "P123": {
+    "label": "publisher",
+    "description": "organization or person responsible for publishing a work, such as a book, periodical, printed music, podcast, game or software",
+    "aliases": [
+      "book publisher",
+      "video game publisher",
+      "software publisher",
+      "publishing house",
+      "published by",
+      "board game publisher",
+      "comic publisher",
+      "comic book publisher",
+      "music publisher",
+      "printed music publisher",
+      "sheet music publisher"
+    ],
+    "datatype": "wikibase-item",
+    "retrieved": "2026-09-29"
+  },
+  "P1433": {
+    "label": "published in",
+    "description": "larger work that a given work was published in, like a journal, a website, a collection, a book or a music album",
+    "aliases": [
+      "on the tracklist of",
+      "venue",
+      "part of work",
+      "published in journal",
+      "chapter of",
+      "article of",
+      "essay of",
+      "work",
+      "volume of",
+      "tome of",
+      "volume of the book",
+      "tome of the book",
+      "serialized in",
+      "manga magazine",
+      "magazine",
+      "periodical",
+      "prepublished in"
+    ],
+    "datatype": "wikibase-item",
+    "retrieved": "2026-09-29"
+  },
+  "P1476": {
+    "label": "title",
+    "description": "published name of a work, such as a newspaper article, a literary work, piece of music, a website, or a performance work",
+    "aliases": [
+      "original title",
+      "known as",
+      "full title",
+      "headline",
+      "titled",
+      "page name",
+      "article title"
+    ],
+    "datatype": "monolingualtext",
+    "retrieved": "2026-09-29"
+  },
+  "P1545": {
+    "label": "series ordinal",
+    "description": "position of an item in its parent series (most frequently a 1-based index), generally to be used as a qualifier (different from \"rank\" defined as a class, and from \"ranking\" defined as a property for evaluating a quality)",
+    "aliases": [
+      "sorting order",
+      "position in series",
+      "number",
+      "ordinal number",
+      "series number",
+      "sort order",
+      "section number",
+      "unit number",
+      "index",
+      "num.",
+      "rank",
+      "ordinal"
+    ],
+    "datatype": "string",
+    "retrieved": "2026-09-29"
+  },
+  "P212": {
+    "label": "ISBN-13",
+    "description": "identifier for a book (edition), thirteen digit",
+    "aliases": [],
+    "datatype": "external-id",
+    "retrieved": "2026-09-29"
+  },
+  "P31": {
+    "label": "instance of",
+    "description": "type to which this subject corresponds/belongs. Different from P279 (subclass of); for example: K2 is an instance of mountain; volcano is a subclass of mountain",
+    "aliases": [
+      "is a",
+      "is an",
+      "is a[n]",
+      "unique individual of",
+      "unitary element of class",
+      "type",
+      "example of",
+      "is of type",
+      "has type",
+      "item of type",
+      "was a[n]",
+      "will be a[n] (use 'nature of statement' = 'expected')"
+    ],
+    "datatype": "wikibase-item",
+    "retrieved": "2026-09-29"
+  },
+  "P50": {
+    "label": "author",
+    "description": "main creator(s) of a written work (use on works, not humans); use P2093 (author name string) when Wikidata item is unknown or does not exist",
+    "aliases": [
+      "written by",
+      "writer",
+      "creator",
+      "playwright",
+      "poet",
+      "maker"
+    ],
+    "datatype": "wikibase-item",
+    "retrieved": "2026-09-29"
+  },
+  "P577": {
+    "label": "publication date",
+    "description": "date or point in time when a work or product was first published or released",
+    "aliases": [
+      "air date",
+      "airdate",
+      "be published during",
+      "be published in",
+      "broadcast date",
+      "date of first publication",
+      "date of publication",
+      "date of release",
+      "date published",
+      "date released",
+      "dop",
+      "first publication",
+      "first published",
+      "first released",
+      "initial release",
+      "launch date",
+      "launched",
+      "pubdate",
+      "publication",
+      "publication time",
+      "published",
+      "release date",
+      "released",
+      "released in",
+      "time of publication",
+      "was published during",
+      "was published in",
+      "year of publication",
+      "issued",
+      "drop date",
+      "date issued",
+      "release to the public date",
+      "original air date",
+      "first air date",
+      "date of first airing",
+      "date of original airing",
+      "official release date",
+      "pub date"
+    ],
+    "datatype": "time",
+    "retrieved": "2026-09-29"
+  },
+  "P813": {
+    "label": "retrieved",
+    "description": "date or point in time that information was retrieved from a database or website (for use in online sources)",
+    "aliases": [
+      "access date",
+      "date accessed",
+      "accessdate",
+      "retrieved at",
+      "date retrieved",
+      "date of retrieval",
+      "time of retrieval",
+      "accessed",
+      "consulted",
+      "visited at",
+      "viewed on",
+      "viewed on date",
+      "retrieved date",
+      "date of access",
+      "reference date"
+    ],
+    "datatype": "time",
+    "retrieved": "2026-09-29"
+  },
+  "P854": {
+    "label": "reference URL",
+    "description": "should be used for Internet URLs as references. Use \"Wikimedia import URL\" (P4656) for imports from Wikimedia sites",
+    "aliases": [
+      "webref",
+      "URL",
+      "ref",
+      "ref URL",
+      "source URL",
+      "website",
+      "url for reference",
+      "reference Uniform Resource Locator",
+      "stated at URL",
+      "refURL"
+    ],
+    "datatype": "url",
+    "retrieved": "2026-09-29"
+  },
+  "P921": {
+    "label": "main subject",
+    "description": "primary topic of a work or act of communication",
+    "aliases": [
+      "about",
+      "artistic theme",
+      "content deals with",
+      "content describes",
+      "content is about",
+      "describes",
+      "descriptor",
+      "focus",
+      "focuses on",
+      "has a subject",
+      "has subject",
+      "has topic",
+      "in regards to",
+      "index term",
+      "is about",
+      "keyword",
+      "main issue",
+      "main keyword",
+      "main theme",
+      "main thing",
+      "main topic",
+      "mainly about",
+      "of",
+      "plot keyword",
+      "primary keyword",
+      "primary subject",
+      "primary topic",
+      "regarding",
+      "regards",
+      "sitter",
+      "subject",
+      "subject heading",
+      "theme",
+      "topic",
+      "topic of work",
+      "/common/topic/subject",
+      "iconography",
+      "subject matter"
+    ],
+    "datatype": "wikibase-item",
+    "retrieved": "2026-09-29"
+  },
+  "P957": {
+    "label": "ISBN-10",
+    "description": "former identifier for a book (edition), ten digits. Used for all publications up to 2006 (convertible to ISBN-13 for some online catalogs; useful for old books or fac-similes not reedited since 2007)",
+    "aliases": [
+      "isbn-10",
+      "International Standard Book Number-10",
+      "isbn",
+      "ISBN10"
+    ],
+    "datatype": "external-id",
+    "retrieved": "2026-09-29"
+  },
+  "Q11872782": {
+    "label": "Final Mission",
+    "description": "1984 film directed by Cirio H. Santiago",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q122376295": {
+    "label": "Final Missions",
+    "description": "2018 video game",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q126185964": {
+    "label": "Final Mission, The",
+    "description": "1988 video game",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q132831026": {
+    "label": "Final Mission",
+    "description": "Wikimedia disambiguation page",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q134964489": {
+    "label": "Final Mission VR",
+    "description": "2019 video game developed by OCIO Games",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q135010595": {
+    "label": "Bolo",
+    "description": "fictional tank",
+    "aliases": [
+      "Bolo Tank"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q135012171": {
+    "label": "A Short History of the Bolo Fighting Machines",
+    "description": "short story by Keith Laumer",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q135012308": {
+    "label": "Field Test",
+    "description": "short story by Keith Laumer",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q141600939": {
+    "label": "Rogue Bolo",
+    "description": "1986 collection of linked military science fiction stories",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q16248383": {
+    "label": "Final Mission",
+    "description": "2013 Indian film",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q16710404": {
+    "label": "Codename 7700 – The Final Experiment",
+    "description": "1994 film",
+    "aliases": [
+      "Final Mission"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q2491737": {
+    "label": "S.C.A.T.: Special Cybernetic Attack Team",
+    "description": "1990 video game",
+    "aliases": [
+      "Final Mission",
+      "Action in New York"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q48997316": {
+    "label": "Bolo: Annals of the Dinochrome Brigade",
+    "description": "1976 science fiction story collection by Keith Laumer",
+    "aliases": [
+      "Bolo"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q5449415": {
+    "label": "Final Mission",
+    "description": "9th episode of the fourth season of Star Trek: The Next Generation",
+    "aliases": [
+      "fm"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q61456381": {
+    "label": "Attrition",
+    "description": "2018 film directed by Mathieu Weschler",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q724395": {
+    "label": "Keith Laumer",
+    "description": "American science fiction writer (1925–1993)",
+    "aliases": [
+      "John Keith Laumer"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q7725634": {
+    "label": "literary work",
+    "description": "written work read for enjoyment or edification",
+    "aliases": [
+      "work in literature",
+      "literary text"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  }
+}

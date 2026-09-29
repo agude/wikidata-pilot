@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import re
+from datetime import date
+from typing import Any
 
 import httpx
 
@@ -53,6 +55,41 @@ class WikidataClient:
         if any(not isinstance(item, dict) or "missing" in item for item in entities.values()):
             raise ValueError(f"Wikidata item {qid} is missing")
         return payload
+
+    def metadata(self, ids: list[str]) -> dict[str, dict[str, Any]]:
+        """Fetch English metadata in API batches of at most 50 IDs."""
+        if any(not re.fullmatch(r"[QP][1-9][0-9]*", identifier) for identifier in ids):
+            raise ValueError("Expected Wikidata QIDs or PIDs")
+        result: dict[str, dict[str, Any]] = {}
+        for offset in range(0, len(ids), 50):
+            batch = ids[offset : offset + 50]
+            payload = self.request(
+                {
+                    "action": "wbgetentities",
+                    "ids": "|".join(batch),
+                    "format": "json",
+                    "props": "labels|descriptions|aliases|datatype",
+                    "languages": "en",
+                }
+            )
+            entities = payload.get("entities")
+            if not isinstance(entities, dict):
+                raise ValueError("Wikidata metadata response has no entities")
+            for identifier in batch:
+                item = entities.get(identifier)
+                if not isinstance(item, dict) or "missing" in item:
+                    raise ValueError(f"Wikidata entity {identifier} is missing")
+                # Redirects need an identity decision, not an implicit cache alias.
+                if item.get("id") != identifier:
+                    raise ValueError(f"Wikidata redirected {identifier}; inspect its identity")
+                result[identifier] = {
+                    "label": item.get("labels", {}).get("en", {}).get("value", ""),
+                    "description": item.get("descriptions", {}).get("en", {}).get("value", ""),
+                    "aliases": [alias["value"] for alias in item.get("aliases", {}).get("en", [])],
+                    "datatype": item.get("datatype"),
+                    "retrieved": date.today().isoformat(),
+                }
+        return result
 
     def search(self, query: str) -> list[dict[str, str]]:
         payload = self.request(
