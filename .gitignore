@@ -7,6 +7,7 @@ __pycache__/
 .uv-cache/
 .uv-python/
 .pystow/
+.wikidata-pilot-state/
 .coverage
 htmlcov/
 dist/

@@ -9,8 +9,46 @@ installation and the case format. [Modeling](modeling.md) covers claim scope.
 Read Wikidata through these APIs. Check local metadata and modeling guidance
 first. Browse external sources to verify facts; do not browse Wikidata entity
 HTML or `Special:WhatLinksHere`. Research commands print compact JSON without
-saving files or updating the metadata cache. Store saved results under
+saving request artifacts or updating tracked metadata. Store saved results under
 `requests/<request-name>/`.
+
+### API access
+
+Set `WIKIDATA_PILOT_CONTACT` to a real operator email address or project URL
+before a request needs the network. The value is included in the versioned
+User-Agent. A cache hit and offline commands do not require contact settings.
+No contact value is built into the package.
+
+`just pilot` stores shared endpoint locks, cooldown timestamps, and candidate
+results in the ignored `.wikidata-pilot-state/` directory. Set
+`WIKIDATA_PILOT_STATE_DIR` to use another writable directory. Direct calls to
+`bin/pilot` use the same repository state directory even when run from another
+working directory. An installed console script outside the repository uses
+`$XDG_CACHE_HOME/wikidata-pilot` (or `~/.cache/wikidata-pilot`). Processes on
+the same machine share coordination only when they use the same state
+directory. State does not coordinate across machines. The OS releases a lock
+when its process exits, including an interrupted process.
+
+Requests to each API endpoint are serialized across CLI processes that use the
+same state directory. Action API reads send `maxlag=5`. Both endpoints use a
+20-second HTTP timeout and request compressed responses. The client makes at
+most three attempts per HTTP request and waits at most 120 seconds for
+cooldowns and locks combined; network response time is separate. It honors
+`Retry-After` seconds and HTTP dates. A headerless 429 uses exponential backoff
+starting at five seconds with jitter. A recognized outage message waits at
+least 60 seconds. A 503 is retried only when it includes `Retry-After` or
+identifies `maxlag`; query timeouts and other 503 responses fail without
+retry. HTTP 200 Action API `maxlag` errors are retried. Waits are reported on
+stderr. Cooldowns are saved before waiting, including after the last attempt.
+If a requested delay exceeds the wait budget, the command exits with the saved
+cooldown time and a retry-later message.
+
+Successful `search`, `identifier`, `linked`, and `ancestors` candidate results
+are cached for five minutes, with a maximum of 128 entries. Expired entries
+are removed when a result is written. `--fresh` bypasses this candidate cache;
+it still honors shared locks and server cooldowns. Inspection, metadata
+refresh, guidance, revision history, and snapshots always fetch current API
+data.
 
 | Need | Command |
 |---|---|
@@ -32,12 +70,13 @@ with the same arguments and `--offset VALUE` until it is null. `backlinks` and
 `history` return `next_cursor`; repeat with `--cursor 'VALUE'` until null.
 `--limit` accepts 1–50. Do not treat a first page as an exhaustive list.
 
-SPARQL commands (`identifier`, `linked`, `ancestors`) use best-ranked direct
-statements: deprecated statements are excluded, and preferred statements
-suppress normal statements for that property. Results are sorted by entity
-URI, not relevance or hierarchy depth. The query service and name search can
-lag edits. Empty results do not prove absence. Inspect candidate records
-before deciding identity; Wikidata statements do not replace source evidence.
+Relationship SPARQL commands (`linked`, `ancestors`, and `identifier` for
+P1433/P2860) use best-ranked direct statements: deprecated statements are
+excluded, and preferred statements suppress normal statements for that
+property. Results are sorted by entity URI, not relevance or hierarchy depth.
+The query service and Action API search index can lag edits. Empty results do
+not prove absence. Inspect candidate records before deciding identity;
+Wikidata statements do not replace source evidence.
 
 ## inspect
 
@@ -69,7 +108,8 @@ just pilot search "publisher" --type property
 
 Search English names and aliases. The default type is `item` and limit is 10.
 Results contain IDs, labels, and descriptions; a matching name is a candidate,
-not an identity decision.
+not an identity decision. Successful pages are cached for five minutes. Add
+`--fresh` to bypass the candidate cache.
 
 ## identifier
 
@@ -77,11 +117,19 @@ not an identity decision.
 just pilot identifier P212 "9780441069972"
 ```
 
-Find exact string or external-identifier values through SPARQL. The default
-limit is 10. Values are escaped as string literals, including values shaped
-like QIDs. Supply the representation Wikidata stores; the command does not
-normalize ISBNs, remove punctuation, or check the property's datatype.
-Inspect returned items to confirm edition or person identity.
+Find candidate string or external-identifier values with the Action API
+`haswbstatement` search. The default limit is 10. The search index is
+case-insensitive and may lag edits, so the command batch-inspects hits and
+returns only case-sensitive exact values from best-ranked statements:
+deprecated statements are excluded, and preferred statements suppress normal
+statements for that property. Search offsets preserve the API continuation,
+even when verification filters every result from a page. The index currently
+omits P1433 (`published in`) and P2860 (`cites`); those properties use direct
+SPARQL relationship queries and require a QID value. No throttling error
+triggers automatic SPARQL fallback. Supply the representation Wikidata stores;
+the command does not normalize ISBNs, remove punctuation, or check the
+property's datatype. Add `--fresh` to bypass the candidate cache. Inspect
+returned items to confirm edition or person identity.
 
 ## linked
 
@@ -220,6 +268,14 @@ identity or verify a proposed claim. No command submits edits to Wikidata.
 
 ## API sources
 
+- [API etiquette](https://www.mediawiki.org/wiki/API:Etiquette/en),
+  [User-Agent policy](https://foundation.wikimedia.org/wiki/Policy:Wikimedia_Foundation_User-Agent_Policy),
+  and [maxlag](https://www.mediawiki.org/wiki/Manual:Maxlag_parameter):
+  client identification and server load handling.
+- [WikibaseCirrusSearch statement search](https://www.mediawiki.org/wiki/Help:Extension:WikibaseCirrusSearch):
+  `haswbstatement` syntax, case behavior, and excluded properties.
+- [WDQS query limits](https://www.mediawiki.org/wiki/Wikidata_query_service/User_Manual#Query_limits):
+  limits for relationship and hierarchy queries.
 - [Wikibase API](https://www.mediawiki.org/wiki/Wikibase/API): entities, names,
   and sitelink resolution.
 - [SPARQL tutorial](https://www.wikidata.org/wiki/Wikidata:SPARQL_tutorial):

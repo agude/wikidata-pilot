@@ -116,11 +116,13 @@ def parser() -> argparse.ArgumentParser:
     search.add_argument("--type", choices=["item", "property"], default="item")
     search.add_argument("--limit", type=int, default=10)
     search.add_argument("--offset", type=int, default=0)
+    search.add_argument("--fresh", action="store_true", help="bypass cached candidates")
     linked = command("linked", help="find incoming statements for one property")
     linked.add_argument("qid")
     linked.add_argument("--property", required=True)
     linked.add_argument("--limit", type=int, default=50)
     linked.add_argument("--offset", type=int, default=0)
+    linked.add_argument("--fresh", action="store_true", help="bypass cached candidates")
     backlinks = command("backlinks", help="list incoming item-page links")
     backlinks.add_argument("qid")
     backlinks.add_argument("--limit", type=int, default=50)
@@ -133,11 +135,13 @@ def parser() -> argparse.ArgumentParser:
     identifier.add_argument("value")
     identifier.add_argument("--limit", type=int, default=10)
     identifier.add_argument("--offset", type=int, default=0)
+    identifier.add_argument("--fresh", action="store_true", help="bypass cached candidates")
     ancestors = command("ancestors", help="trace class hierarchies")
     ancestors.add_argument("qid")
     ancestors.add_argument("--instance-of", action="store_true")
     ancestors.add_argument("--limit", type=int, default=50)
     ancestors.add_argument("--offset", type=int, default=0)
+    ancestors.add_argument("--fresh", action="store_true", help="bypass cached candidates")
     resolve = command("resolve", help="find an item from a wiki page title")
     resolve.add_argument("site")
     resolve.add_argument("title")
@@ -256,21 +260,37 @@ def main(argv: Sequence[str] | None = None) -> int:
             with WikidataClient() as client:
                 if args.command == "search":
                     result = client.search_page(
-                        args.query, entity_type=args.type, limit=args.limit, offset=args.offset
+                        args.query,
+                        entity_type=args.type,
+                        limit=args.limit,
+                        offset=args.offset,
+                        fresh=args.fresh,
                     )
                 elif args.command == "linked":
                     result = client.linked(
-                        args.qid, args.property, limit=args.limit, offset=args.offset
+                        args.qid,
+                        args.property,
+                        limit=args.limit,
+                        offset=args.offset,
+                        fresh=args.fresh,
                     )
                 elif args.command == "backlinks":
                     result = client.backlinks(args.qid, limit=args.limit, cursor=args.cursor)
                 elif args.command == "identifier":
                     result = client.identifier(
-                        args.property, args.value, limit=args.limit, offset=args.offset
+                        args.property,
+                        args.value,
+                        limit=args.limit,
+                        offset=args.offset,
+                        fresh=args.fresh,
                     )
                 elif args.command == "ancestors":
                     result = client.ancestors(
-                        args.qid, instance_of=args.instance_of, limit=args.limit, offset=args.offset
+                        args.qid,
+                        instance_of=args.instance_of,
+                        limit=args.limit,
+                        offset=args.offset,
+                        fresh=args.fresh,
                     )
                 elif args.command == "resolve":
                     result = client.resolve(args.site, args.title)

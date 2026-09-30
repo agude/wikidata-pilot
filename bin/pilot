@@ -5,5 +5,6 @@ repo_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 export UV_CACHE_DIR="${UV_CACHE_DIR:-$repo_root/.uv-cache}"
 export UV_PYTHON_INSTALL_DIR="${UV_PYTHON_INSTALL_DIR:-$repo_root/.uv-python}"
 export PYSTOW_HOME="${PYSTOW_HOME:-$repo_root/.pystow}"
+export WIKIDATA_PILOT_STATE_DIR="${WIKIDATA_PILOT_STATE_DIR:-$repo_root/.wikidata-pilot-state}"
 
 exec uv --project "$repo_root" run wikidata-pilot "$@"

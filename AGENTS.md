@@ -62,6 +62,9 @@ command help points to the relevant section. Do not browse item or property
 HTML or `Special:WhatLinksHere`. Use browsing tools for external evidence.
 Check local metadata and modeling guidance first. Inspect candidate identities
 before proposing edits; query results can lag changes.
+Set `WIKIDATA_PILOT_CONTACT` to an operator email or project URL before network
+access, honor shared endpoint cooldowns, and use `--fresh` only to bypass the
+short-lived candidate cache. See the API settings in `docs/commands.md`.
 
 ## Pilot a research case
 

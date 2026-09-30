@@ -38,9 +38,44 @@ def test_batch_inspection_fetches_once_and_rejects_missing_records():
 
 def test_identifier_escaping_and_hierarchy_pagination():
     queries = []
+    exact_value = 'value"\\ path'
 
     def response(request):
-        query = request.url.params["query"]
+        params = request.url.params
+        if params.get("list") == "search":
+            queries.append(params["srsearch"])
+            escaped = exact_value.replace("\\", "\\\\").replace('"', '\\"')
+            assert params["srsearch"] == f'haswbstatement:"P212={escaped}"'
+            return httpx.Response(
+                200,
+                json={
+                    "query": {"search": [{"title": "Q2"}]},
+                    "continue": {"sroffset": 5, "continue": "-||"},
+                },
+            )
+        if params.get("action") == "wbgetentities":
+            return httpx.Response(
+                200,
+                json={
+                    "entities": {
+                        "Q2": {
+                            "id": "Q2",
+                            "claims": {
+                                "P212": [
+                                    {
+                                        "rank": "normal",
+                                        "mainsnak": {
+                                            "snaktype": "value",
+                                            "datavalue": {"value": exact_value},
+                                        },
+                                    }
+                                ]
+                            },
+                        }
+                    }
+                },
+            )
+        query = params["query"]
         queries.append(query)
         return httpx.Response(
             200,
@@ -56,16 +91,13 @@ def test_identifier_escaping_and_hierarchy_pagination():
 
     with httpx.Client(transport=httpx.MockTransport(response)) as http:
         client = WikidataClient(http)
-        page = client.identifier("P212", 'value"\n\\', limit=1, offset=4)
-        assert page["next_offset"] == 5
-        assert 'wdt:P212 "value\\"\\n\\\\"' in queries[-1]
-        assert "LIMIT 2 OFFSET 4" in queries[-1]
+        page = client.identifier("P212", exact_value, limit=1, offset=4)
+        assert page == {"results": [{"id": "Q2", "label": "", "description": ""}], "next_offset": 5}
         client.ancestors("Q1")
         assert "wd:Q1 wdt:P279+ ?item" in queries[-1]
         assert "FILTER(?item != wd:Q1)" in queries[-1]
         client.ancestors("Q1", instance_of=True)
         assert "wd:Q1 wdt:P31/wdt:P279* ?item" in queries[-1]
-        assert client.search_identifier("P212", "123")[0]["id"] == "Q2"
         for pid, value in [("P0", "123"), ("P212", " "), ("P212 }", "123")]:
             with pytest.raises(ValueError):
                 client.identifier(pid, value)
@@ -175,7 +207,32 @@ def test_malformed_responses_fail(method, payload):
 def test_cli_operations_and_help_references(tmp_path, monkeypatch, capsys):
     def response(request):
         params = request.url.params
+        if params.get("list") == "search":
+            return httpx.Response(200, json={"query": {"search": [{"title": "Q1"}]}})
         if params.get("action") == "wbgetentities":
+            if "ids" in params:
+                return httpx.Response(
+                    200,
+                    json={
+                        "entities": {
+                            key: {
+                                "id": key,
+                                "claims": {
+                                    "P212": [
+                                        {
+                                            "rank": "normal",
+                                            "mainsnak": {
+                                                "snaktype": "value",
+                                                "datavalue": {"value": "123"},
+                                            },
+                                        }
+                                    ]
+                                },
+                            }
+                            for key in params["ids"].split("|")
+                        }
+                    },
+                )
             return httpx.Response(
                 200,
                 json={"entities": {key: {"id": key} for key in params.get("ids", "Q1").split("|")}},

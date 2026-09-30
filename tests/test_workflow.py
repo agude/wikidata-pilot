@@ -359,6 +359,7 @@ def test_prepare_rejects_path_collisions_before_writing(tmp_path, collision):
             "UV_CACHE_DIR": "uv cache override",
             "UV_PYTHON_INSTALL_DIR": "python override",
             "PYSTOW_HOME": "pystow override",
+            "WIKIDATA_PILOT_STATE_DIR": "state override",
         },
         {},
     ],
@@ -370,14 +371,19 @@ def test_pilot_forwards_arguments_and_environment_overrides(tmp_path, overrides)
     working_directory = tmp_path / "cwd.txt"
     fake_uv = fake_bin / "uv"
     fake_uv.write_text(
-        '#!/usr/bin/env bash\nprintf \'%s\\n\' "$@" > "$ARGUMENT_LOG"\nprintf \'%s\\n\' "$PWD" > "$WORKING_DIRECTORY"\nprintf \'%s\\n\' "$UV_CACHE_DIR" "$UV_PYTHON_INSTALL_DIR" "$PYSTOW_HOME" > "$CACHE_LOG"\n',
+        '#!/usr/bin/env bash\nprintf \'%s\\n\' "$@" > "$ARGUMENT_LOG"\nprintf \'%s\\n\' "$PWD" > "$WORKING_DIRECTORY"\nprintf \'%s\\n\' "$UV_CACHE_DIR" "$UV_PYTHON_INSTALL_DIR" "$PYSTOW_HOME" "$WIKIDATA_PILOT_STATE_DIR" > "$CACHE_LOG"\n',
         encoding="utf-8",
     )
     fake_uv.chmod(0o755)
     cache_log = tmp_path / "cache.txt"
     environment = dict(os.environ)
     environment.update({key: str(tmp_path / value) for key, value in overrides.items()})
-    for key in ("UV_CACHE_DIR", "UV_PYTHON_INSTALL_DIR", "PYSTOW_HOME"):
+    for key in (
+        "UV_CACHE_DIR",
+        "UV_PYTHON_INSTALL_DIR",
+        "PYSTOW_HOME",
+        "WIKIDATA_PILOT_STATE_DIR",
+    ):
         if not overrides:
             environment.pop(key, None)
     environment.update(
@@ -409,6 +415,7 @@ def test_pilot_forwards_arguments_and_environment_overrides(tmp_path, overrides)
         str(Path(__file__).parents[1] / ".uv-cache"),
         str(Path(__file__).parents[1] / ".uv-python"),
         str(Path(__file__).parents[1] / ".pystow"),
+        str(Path(__file__).parents[1] / ".wikidata-pilot-state"),
     ]
     expected = (
         [str(tmp_path / overrides[key]) for key in overrides] if overrides else expected_defaults
@@ -420,6 +427,10 @@ def test_wikidata_client_handles_search_and_errors() -> None:
     class Response:
         def __init__(self, payload: object) -> None:
             self.payload = payload
+            self.status_code = 200
+            self.headers: dict[str, str] = {}
+            self.text = ""
+            self.reason_phrase = "OK"
 
         def raise_for_status(self) -> None:
             return None
@@ -439,6 +450,30 @@ def test_wikidata_client_handles_search_and_errors() -> None:
                                     "itemLabel": {"value": "Nine"},
                                 }
                             ]
+                        }
+                    }
+                )
+            params = kwargs.get("params", {})
+            if isinstance(params, dict) and params.get("list") == "search":
+                return Response({"query": {"search": [{"title": "Q9"}]}})
+            if isinstance(params, dict) and params.get("action") == "wbgetentities":
+                return Response(
+                    {
+                        "entities": {
+                            "Q9": {
+                                "id": "Q9",
+                                "claims": {
+                                    "P212": [
+                                        {
+                                            "rank": "normal",
+                                            "mainsnak": {
+                                                "snaktype": "value",
+                                                "datavalue": {"value": "9780000000000"},
+                                            },
+                                        }
+                                    ]
+                                },
+                            }
                         }
                     }
                 )

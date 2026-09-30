@@ -16,6 +16,7 @@ pilot *args:
 export UV_CACHE_DIR := env_var_or_default("UV_CACHE_DIR", justfile_directory() / ".uv-cache")
 export UV_PYTHON_INSTALL_DIR := env_var_or_default("UV_PYTHON_INSTALL_DIR", justfile_directory() / ".uv-python")
 export PYSTOW_HOME := env_var_or_default("PYSTOW_HOME", justfile_directory() / ".pystow")
+export WIKIDATA_PILOT_STATE_DIR := env_var_or_default("WIKIDATA_PILOT_STATE_DIR", justfile_directory() / ".wikidata-pilot-state")
 
 # Install dependencies
 sync:

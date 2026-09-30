@@ -96,7 +96,10 @@ Use API commands for Wikidata reads and browse external sources for evidence.
 The [command reference](docs/commands.md) covers identifier lookup, batch
 inspection, relationships, class hierarchies, sitelink resolution, history,
 backlinks, and guidance sections, including pagination and failure behavior.
-Every command's `--help` points to its reference section.
+Every command's `--help` points to its reference section. Before a network
+request, set `WIKIDATA_PILOT_CONTACT` to an operator email or project URL. The
+command reference documents shared cooldowns, retry limits, and the five
+minute candidate cache.
 
 ```sh
 just pilot identifier P212 "9780441069972"

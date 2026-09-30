@@ -150,7 +150,7 @@ def test_missing_items_and_api_errors_are_not_empty_searches() -> None:
             client.search_identifier("bad", "42")
 
     def api_error(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, json={"error": {"code": "maxlag"}})
+        return httpx.Response(200, json={"error": {"code": "badvalue"}})
 
     with (
         httpx.Client(transport=httpx.MockTransport(api_error)) as transport,
