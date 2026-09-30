@@ -15,6 +15,20 @@ just pilot --help
 
 ## Quick start
 
+For agent-led research, use the repo-local
+[`wikidata-research` skill](.agents/skills/wikidata-research/SKILL.md). Its
+references cover [books and editions](.agents/skills/wikidata-research/references/books.md)
+and [authors](.agents/skills/wikidata-research/references/authors.md), including
+fields to consider and the evidence each field needs. Invoke it in a Codex
+session opened in this repo:
+
+```text
+$wikidata-research Check whether the Rogue Bolo story is a novella.
+```
+
+The skill lives under `.agents/skills/`, the
+[repo-local discovery path](https://learn.chatgpt.com/docs/build-skills#where-codex-loads-local-skills).
+
 ```sh
 just pilot init requests/bolo/case.json
 just pilot inspect Q48997316 > requests/bolo/collection.json

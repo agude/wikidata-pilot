@@ -1,0 +1,25 @@
+{
+  "skill_name": "wikidata-research",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "The publisher calls Rogue Bolo a novella. The case already has separate story and collection entities. Should we tag the story as such?",
+      "expected_output": "Consult local modeling guidance and metadata, check the publisher excerpt for the story, propose P7937 Q149537 on the story only, and preserve existing broad classification. Do not classify the collection or unrelated stories. Leave submitted batches unchanged."
+    },
+    {
+      "id": 2,
+      "prompt": "Research an author from a publisher bio that gives a name and bibliography but no birth date or nationality. Two Wikidata candidates share that name.",
+      "expected_output": "Compare linked works and authority identifiers, keep ambiguous identity unresolved, and record supported facts only. Birth date and citizenship remain unknown. Do not infer citizenship from language or add P50 to the person."
+    },
+    {
+      "id": 3,
+      "prompt": "This 1986 edition has an ISBN and contains a story first published in 1969. Prepare the missing bibliographic claims.",
+      "expected_output": "Keep edition identifiers and 1986 edition publication separate from the story's 1969 first publication. Verify which collection or edition P1433 targets. Keep case and draft outputs inside an ignored request directory and validate before exporting."
+    },
+    {
+      "id": 4,
+      "prompt": "Fix the repository's Ruff configuration.",
+      "expected_output": "Do not activate the research skill; this is repository tooling work."
+    }
+  ]
+}

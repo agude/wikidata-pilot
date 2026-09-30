@@ -38,6 +38,9 @@ The shared `data/wikidata_ids.json` cache and modeling guide remain tracked.
 
 ## Incremental case workflow
 
+Use the `wikidata-research` skill in `.agents/skills/wikidata-research/` for
+source research, identity decisions, and book or author field checklists.
+
 From the repository root, inspect only the affected entities and their linked
 sources. Read `docs/modeling.md` and check the local metadata cache before
 external research. Verify support for every new claim, keep the requested
