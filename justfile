@@ -3,8 +3,19 @@
 # check is the full gate that CI runs.
 
 # Default: list available recipes
+set positional-arguments
+
 default:
     @just --list
+
+# Run the CLI with the repository project and cache configuration.
+pilot *args:
+    @./bin/pilot "$@"
+
+# Use writable repository-local uv and library caches unless overridden.
+export UV_CACHE_DIR := env_var_or_default("UV_CACHE_DIR", justfile_directory() / ".uv-cache")
+export UV_PYTHON_INSTALL_DIR := env_var_or_default("UV_PYTHON_INSTALL_DIR", justfile_directory() / ".uv-python")
+export PYSTOW_HOME := env_var_or_default("PYSTOW_HOME", justfile_directory() / ".pystow")
 
 # Install dependencies
 sync:
@@ -14,6 +25,7 @@ sync:
 lint:
     uv run ruff check .
     uv run ruff format --check .
+    shellcheck bin/pilot bin/pre-commit.sh
 
 # Apply formatting and safe lint fixes
 format:

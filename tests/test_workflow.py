@@ -1,9 +1,13 @@
 """Offline tests for evidence validation, matching, plans, and export."""
 
+import json
+import os
+import subprocess
 from datetime import date
 from pathlib import Path
 from typing import Any, Literal
 
+import httpx
 import pytest
 from pydantic import HttpUrl
 
@@ -224,6 +228,192 @@ def test_live_snapshot_calls_only_resolved_items() -> None:
     reader = Reader()
     assert live_snapshot(case(), reader) == {"story": {"qid": "Q1"}}
     assert reader.qids == ["Q1"]
+
+
+def test_prepare_is_offline_by_default_and_writes_consistent_outputs(tmp_path, monkeypatch, capsys):
+    case_path = tmp_path / "research case.json"
+    output_path = tmp_path / "review" / "batch.qs"
+    original = case().model_dump(mode="json")
+    case_path.write_text(json.dumps(original), encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+
+    def unexpected_client():
+        raise AssertionError("offline prepare must not create a Wikidata client")
+
+    monkeypatch.setattr(cli, "WikidataClient", unexpected_client)
+    assert cli.main(["prepare", str(case_path), "--output", str(output_path)]) == 0
+    assert capsys.readouterr().out.startswith("Wrote ")
+    assert case_path.read_text(encoding="utf-8") == json.dumps(original)
+    proposal = json.loads(case_path.with_suffix(".plan.json").read_text(encoding="utf-8"))
+    assert proposal["snapshot"] == {}
+    assert "live snapshot not captured" in case_path.with_suffix(".plan.md").read_text()
+    assert output_path.read_text().startswith("Q1|P1433|Q2")
+
+
+def test_prepare_snapshot_is_opt_in_and_validation_failure_preserves_outputs(
+    tmp_path, monkeypatch, capsys
+):
+    case_path = tmp_path / "case.json"
+    valid = case().model_dump(mode="json")
+    case_path.write_text(json.dumps(valid), encoding="utf-8")
+    output_path = tmp_path / "batch.qs"
+    outputs = [case_path.with_suffix(".plan.md"), case_path.with_suffix(".plan.json"), output_path]
+
+    class SnapshotClient:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return None
+
+        def inspect(self, qid):
+            inspected_qids.append(qid)
+            return {"snapshot": qid}
+
+    inspected_qids: list[str] = []
+    valid["entities"].append(
+        {
+            "key": "new-collection",
+            "kind": "collection",
+            "label": "New collection",
+            "description": "anthology",
+            "resolution": {"status": "create", "reason": "searched title and ISBN"},
+            "claims": [],
+        }
+    )
+    case_path.write_text(json.dumps(valid), encoding="utf-8")
+    monkeypatch.setattr(cli, "WikidataClient", SnapshotClient)
+    assert cli.main(["prepare", str(case_path), "--output", str(output_path), "--snapshot"]) == 0
+    assert inspected_qids == ["Q1"]
+    proposal = json.loads(outputs[1].read_text(encoding="utf-8"))
+    assert proposal["snapshot"] == {"story": {"snapshot": "Q1"}}
+
+    invalid = case().model_dump(mode="json")
+    invalid["sources"][0]["verification"] = "illustrative_unverified"
+    case_path.write_text(json.dumps(invalid), encoding="utf-8")
+    for path in outputs:
+        path.write_text("keep this\n", encoding="utf-8")
+    before = {path: path.read_bytes() for path in [case_path, *outputs]}
+    assert cli.main(["prepare", str(case_path), "--output", str(output_path)]) == 1
+    assert "illustrative_unverified" in capsys.readouterr().err
+    assert {path: path.read_bytes() for path in before} == before
+
+
+def test_prepare_remote_failure_preserves_existing_outputs(tmp_path, monkeypatch, capsys):
+    case_path = tmp_path / "case.json"
+    case_path.write_text(case().model_dump_json(), encoding="utf-8")
+    output_paths = [
+        case_path.with_suffix(".plan.md"),
+        case_path.with_suffix(".plan.json"),
+        tmp_path / "batch.qs",
+    ]
+    for path in output_paths:
+        path.write_text("keep this\n", encoding="utf-8")
+    before = {path: path.read_bytes() for path in [case_path, *output_paths]}
+
+    class FailedSnapshotClient:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return None
+
+        def inspect(self, qid):
+            raise httpx.ConnectError("remote failure")
+
+    monkeypatch.setattr(cli, "WikidataClient", FailedSnapshotClient)
+    assert (
+        cli.main(["prepare", str(case_path), "--output", str(output_paths[2]), "--snapshot"]) == 2
+    )
+    assert "remote failure" in capsys.readouterr().err
+    assert {path: path.read_bytes() for path in before} == before
+
+
+@pytest.mark.parametrize("collision", ["case", "cache", "plan", "json", "symlink"])
+def test_prepare_rejects_path_collisions_before_writing(tmp_path, collision):
+    case_path = tmp_path / "case.json"
+    case_path.write_text(case().model_dump_json(), encoding="utf-8")
+    before = case_path.read_bytes()
+    output_path = tmp_path / "batch.qs"
+    arguments = ["prepare", str(case_path), "--output", str(output_path)]
+    if collision == "case":
+        arguments[3] = str(case_path)
+    elif collision == "cache":
+        arguments.extend(["--cache", str(case_path)])
+    elif collision == "plan":
+        arguments[3] = str(case_path.with_suffix(".plan.md"))
+    elif collision == "json":
+        arguments[3] = str(case_path.with_suffix(".plan.json"))
+    else:
+        alias = tmp_path / "alias.json"
+        alias.symlink_to(case_path)
+        arguments[3] = str(alias)
+    assert cli.main(arguments) == 2
+    assert case_path.read_bytes() == before
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {
+            "UV_CACHE_DIR": "uv cache override",
+            "UV_PYTHON_INSTALL_DIR": "python override",
+            "PYSTOW_HOME": "pystow override",
+        },
+        {},
+    ],
+)
+def test_pilot_forwards_arguments_and_environment_overrides(tmp_path, overrides):
+    fake_bin = tmp_path / "fake-bin"
+    fake_bin.mkdir()
+    argument_log = tmp_path / "arguments.txt"
+    working_directory = tmp_path / "cwd.txt"
+    fake_uv = fake_bin / "uv"
+    fake_uv.write_text(
+        '#!/usr/bin/env bash\nprintf \'%s\\n\' "$@" > "$ARGUMENT_LOG"\nprintf \'%s\\n\' "$PWD" > "$WORKING_DIRECTORY"\nprintf \'%s\\n\' "$UV_CACHE_DIR" "$UV_PYTHON_INSTALL_DIR" "$PYSTOW_HOME" > "$CACHE_LOG"\n',
+        encoding="utf-8",
+    )
+    fake_uv.chmod(0o755)
+    cache_log = tmp_path / "cache.txt"
+    environment = dict(os.environ)
+    environment.update({key: str(tmp_path / value) for key, value in overrides.items()})
+    for key in ("UV_CACHE_DIR", "UV_PYTHON_INSTALL_DIR", "PYSTOW_HOME"):
+        if not overrides:
+            environment.pop(key, None)
+    environment.update(
+        {
+            "ARGUMENT_LOG": str(argument_log),
+            "WORKING_DIRECTORY": str(working_directory),
+            "CACHE_LOG": str(cache_log),
+        }
+    )
+    environment["PATH"] = f"{fake_bin}:{environment['PATH']}"
+    subprocess.run(
+        [
+            str(Path(__file__).parents[1] / "bin" / "pilot"),
+            "prepare",
+            "case folder/case file.json",
+            "--output",
+            "review file.qs",
+        ],
+        cwd=tmp_path,
+        env=environment,
+        check=True,
+    )
+    arguments = argument_log.read_text(encoding="utf-8").splitlines()
+    assert arguments[-4:] == ["prepare", "case folder/case file.json", "--output", "review file.qs"]
+    assert arguments[0] == "--project"
+    assert working_directory.read_text(encoding="utf-8").strip() == str(tmp_path)
+    cache_values = cache_log.read_text(encoding="utf-8").splitlines()
+    expected_defaults = [
+        str(Path(__file__).parents[1] / ".uv-cache"),
+        str(Path(__file__).parents[1] / ".uv-python"),
+        str(Path(__file__).parents[1] / ".pystow"),
+    ]
+    expected = (
+        [str(tmp_path / overrides[key]) for key in overrides] if overrides else expected_defaults
+    )
+    assert cache_values == expected
 
 
 def test_wikidata_client_handles_search_and_errors() -> None:

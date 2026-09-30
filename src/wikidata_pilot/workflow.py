@@ -380,13 +380,18 @@ def write_plan(path: Path, case: Case) -> None:
     path.write_text(render_plan(case), encoding="utf-8")
 
 
-def write_proposal_json(path: Path, case: Case, snapshot: dict[str, object] | None = None) -> None:
+def render_proposal_json(case: Case, snapshot: dict[str, object] | None = None) -> str:
+    """Serialize the case and optional live snapshot for review."""
     payload = {
         "case": case.model_dump(mode="json"),
         "snapshot": snapshot or {},
         "generated": date.today().isoformat(),
     }
-    path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return json.dumps(payload, indent=2, ensure_ascii=False) + "\n"
+
+
+def write_proposal_json(path: Path, case: Case, snapshot: dict[str, object] | None = None) -> None:
+    path.write_text(render_proposal_json(case, snapshot), encoding="utf-8")
 
 
 def _date_value(value: str, precision: str) -> date:

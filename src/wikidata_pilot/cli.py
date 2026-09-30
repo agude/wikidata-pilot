@@ -20,6 +20,7 @@ from .workflow import (
     live_snapshot,
     match_case,
     render_plan,
+    render_proposal_json,
     validate_case,
     write_proposal_json,
 )
@@ -118,6 +119,11 @@ def parser() -> argparse.ArgumentParser:
     export = sub.add_parser("export", help="write staged QuickStatements file")
     export.add_argument("case", type=Path)
     export.add_argument("--output", type=Path, required=True)
+    prepare = sub.add_parser("prepare", help="validate and render all review outputs")
+    prepare.add_argument("case", type=Path)
+    prepare.add_argument("--output", type=Path, required=True, help="staged QuickStatements path")
+    prepare.add_argument("--snapshot", action="store_true", help="fetch current claims")
+    prepare.add_argument("--cache", type=Path, default=DEFAULT_CACHE)
     return root
 
 
@@ -209,6 +215,39 @@ def main(argv: Sequence[str] | None = None) -> int:
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(contents, encoding="utf-8")
             print(f"Wrote staged export: {args.output}")
+            for item in deferred_claims(case):
+                print(f"Deferred relationship pending returned QID: {item}")
+        elif args.command == "prepare":
+            case_path = args.case.resolve()
+            cache_path = args.cache.resolve()
+            qs_path = args.output.resolve()
+            plan_path = args.case.with_suffix(".plan.md").resolve()
+            json_path = plan_path.with_suffix(".json").resolve()
+            paths = [case_path, cache_path, qs_path, plan_path, json_path]
+            if len(set(paths)) != len(paths):
+                raise ValueError("Prepare input, cache, and output paths must all be distinct")
+
+            case = load_case(args.case)
+            errors = validate_case(case)
+            if errors:
+                print("\n".join(errors), file=sys.stderr)
+                return 1
+
+            cache = IdCache(args.cache)
+            qs_contents = export_case(case)
+            snapshot = None
+            if args.snapshot:
+                with WikidataClient() as client:
+                    snapshot = live_snapshot(case, client)
+            plan_contents = render_plan(case, snapshot, cache)
+            json_contents = render_proposal_json(case, snapshot)
+
+            for path in (plan_path, json_path, qs_path):
+                path.parent.mkdir(parents=True, exist_ok=True)
+            plan_path.write_text(plan_contents, encoding="utf-8")
+            json_path.write_text(json_contents, encoding="utf-8")
+            qs_path.write_text(qs_contents, encoding="utf-8")
+            print(f"Wrote {plan_path}, {json_path}, and {qs_path}")
             for item in deferred_claims(case):
                 print(f"Deferred relationship pending returned QID: {item}")
         return 0

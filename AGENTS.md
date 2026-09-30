@@ -20,20 +20,43 @@ Python package using uv, just, Ruff, strict mypy, pytest, and GitHub Actions.
 | `just type-check` | strict mypy on package and tests |
 | `just test` | pytest with coverage gate |
 | `just smoke-test` | build-install and invoke `wikidata-pilot --help` |
-| `just check` | run all local quality checks and smoke test |
+| `just check` | run all local quality checks, shellcheck, and smoke test |
 | `just hooks-install` | install the pre-commit hook once per clone |
+| `just pilot ARGS...` | run the CLI through uv with writable local caches |
 
 Use only explicit, supported claim datatypes. Never submit QuickStatements automatically. Review the plan and the generated batch first.
 
+## Incremental case workflow
+
+From the repository root, inspect only the affected entities and their linked
+sources. Read `docs/modeling.md` and check the local metadata cache before
+external research. Verify support for every new claim, keep the requested
+scope, then regenerate affected outputs once:
+
+```sh
+just pilot prepare CASE --output PATH.qs
+```
+
+Preparation is offline by default. Add `--snapshot` when current item
+statements matter or before submission; an offline plan is not a live check.
+Review the plan, proposal JSON, and QS batch before manual submission.
+
 ## Pilot a research case
 
-1. Read the README case format and initialize a case with the CLI.
+1. Read the README case format and initialize a case with the CLI:
+
+   ```sh
+   just pilot init CASE.json
+   ```
 2. Use browsing tools to inspect source pages. Record actual retrieval dates, supporting excerpts, locators, and claim-to-source links. Mark a source verified only after checking the material and each linked claim. Model memory and search snippets are insufficient evidence.
 3. Search unresolved entities with `match`. Inspect candidate items, alternate titles, authors, and external identifiers before recording an identity decision. Keep uncertain matches unresolved and explain conflicts in the case.
 4. Use `cache --find` for local QID/PID metadata lookup and `cache --case CASE` to fetch missing metadata. Keep `data/wikidata_ids.json` checked in. Names can match multiple IDs; metadata is not evidence or an identity decision. Use `--refresh` explicitly when metadata needs updating. Generate a plan with live snapshots. Review all additions, date precision, qualifiers, work/edition scope, and source support before exporting.
 5. Export the reviewed case. The user submits the batch in QuickStatements. Record returned QIDs and retain the execution report before generating a subsequent batch.
 
-Use `uv run wikidata-pilot` for every CLI invocation. Edit the structured case; do not hand-edit generated commands to bypass validation.
+Use `just pilot` for every CLI invocation. The top-level case object contains
+`schema_version`, `title`, `sources`, and `entities`; see the README table for
+each record's fields. Edit the structured case; do not hand-edit generated
+commands to bypass validation.
 
 ## Git conventions
 
