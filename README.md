@@ -37,7 +37,7 @@ just pilot plan requests/bolo/case.json --snapshot
 
 `init` creates an illustrative Bolo case. Its AbeBooks excerpt is explicitly unverified; replace or verify it before marking that source `verified`. The supplied QIDs are candidates to confirm, not assertions that the listed entities or relationships have been independently verified.
 
-An agent researches the book using its browsing tools, records source passages in `requests/bolo/case.json`, and adds each story as an entity. Set entities needing candidate searches to `unresolved`. The supplied example entities already have QIDs, so `match` skips them. Then run:
+An agent reads Wikidata through the API commands below, uses browsing tools for external book sources, records source passages in `requests/bolo/case.json`, and adds each story as an entity. Set entities needing candidate searches to `unresolved`. The supplied example entities already have QIDs, so `match` skips them. Then run:
 
 ```sh
 just pilot match requests/bolo/case.json
@@ -89,6 +89,44 @@ Entity kinds are `work`, `collection`, `edition`, and `person`. Item values can 
 `plan` writes Markdown and structured JSON. The Markdown shows current claims as “live snapshot not captured” unless used with `--snapshot`; the JSON carries the fetched item payloads for resolved QIDs. Read the before/after report and verify each proposal against its source before export. Wikidata represents both creative works and editions: distinguish a work from a particular edition. Use P1433 (“published in”) to relate a story work to an anthology when the source supports that relationship. Record a story’s first publication date separately from its appearance date in a later anthology.
 
 Claims and qualifiers use explicit datatype sets. Claims require one or more source IDs. Sources default to `illustrative_unverified`; change them to `verified` only after checking the cited material. Export supports item, string, external identifier, date with year/month/day precision, and monolingual text claims. It preserves qualifiers and attaches source URL and retrieval date reference snaks. It blocks unverified sources, unresolved entities, missing evidence, and unsafe values containing newlines, pipes, quotes, or angle brackets. See [docs/modeling.md](docs/modeling.md) for sourced work, edition, collection, and publication-date guidance.
+
+## Wikidata API access
+
+Use the API commands for all Wikidata reads. Results are compact JSON; these
+commands do not save files or update the metadata cache.
+
+```sh
+just pilot search "Keith Laumer"
+just pilot search "publisher" --type property
+# Find works with author (P50) = Keith Laumer.
+just pilot linked Q724395 --property P50 --limit 10
+# Inspect only the statements needed for this decision.
+just pilot inspect Q48997316 --property P31 P50 P577
+just pilot inspect P123 --property P2302
+# Equivalent to item-page backlinks from Special:WhatLinksHere.
+just pilot backlinks Q1368527 --limit 10
+# List guidance sections, then read the required section by its index.
+just pilot page "Wikidata:WikiProject Books"
+just pilot page "Wikidata:WikiProject Books" --section 0
+```
+
+`inspect` defaults to all claims, with English metadata and locally cached
+labels. It retains statement IDs, ranks, qualifiers, reference groups, date
+precision, and unknown or absent values. `--property` selects claims;
+`--raw` returns the full fetched API response, including sitelinks. They
+cannot be combined. Live plan snapshots still contain full API payloads.
+
+`search` and `linked` return `next_offset`; repeat the same command with
+`--offset VALUE` until it is null. `backlinks` returns `next_cursor`; pass it
+with `--cursor 'VALUE'` until it is null. Defaults are 10 results for name
+search and 50 for links; `--limit` accepts 1–50. `linked` uses SPARQL to find
+incoming best-ranked statements for a specific property. Backlinks identify
+page links without specifying a relationship. Candidate searches can lag
+recent edits; inspect items before recording an identity decision.
+
+See the [API access reference](.agents/skills/wikidata-research/references/access.md)
+for research procedures and guidance-page retrieval. Continue to browse
+external sources to verify facts.
 
 ## ID metadata cache
 

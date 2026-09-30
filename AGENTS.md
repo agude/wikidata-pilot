@@ -54,6 +54,15 @@ Preparation is offline by default. Add `--snapshot` when current item
 statements matter or before submission; an offline plan is not a live check.
 Review the plan, proposal JSON, and QS batch before manual submission.
 
+## Wikidata access
+
+Use Wikidata APIs for every Wikidata read through `just pilot`: `search`,
+`inspect`, `linked`, `backlinks`, and `page`. Do not browse item or property
+HTML or `Special:WhatLinksHere`. Read the research skill's
+[API access reference](.agents/skills/wikidata-research/references/access.md)
+for command selection and pagination. Use browsing tools for external source
+evidence. Local metadata and modeling guidance remain the first lookup.
+
 ## Pilot a research case
 
 1. Read the README case format and initialize a case with the CLI:

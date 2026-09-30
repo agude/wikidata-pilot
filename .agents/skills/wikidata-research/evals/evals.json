@@ -30,6 +30,11 @@
       "id": 6,
       "prompt": "The literary work already has a publisher statement. Can the generated batch move it onto an edition?",
       "expected_output": "Flag the conflicting statement and identify a supported edition before proposing additions there. Explain that the additive exporter cannot remove or move the existing statement. Leave removal for separate review rather than claiming the batch fixes the existing conflict."
+    },
+    {
+      "id": 7,
+      "prompt": "Find works by Keith Laumer and items published in this collection. Check publisher constraints and the WikiProject Books edition guidance. Use fewer tokens than browsing Wikidata pages.",
+      "expected_output": "Use local metadata first, linked with the confirmed author QID and P50, linked with the collection QID and P1433, inspect P123 with P2302, and page to select guidance sections. Follow continuation markers instead of treating the first page as exhaustive. Do not browse Wikidata HTML or Special:WhatLinksHere. Inspect candidate identities and use external primary evidence for claims."
     }
   ]
 }

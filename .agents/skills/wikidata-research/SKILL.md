@@ -5,6 +5,12 @@ description: Researches books, stories, collections, editions, and authors for s
 
 # Wikidata research
 
+Use Wikidata APIs for all Wikidata reads. Do not browse item or property HTML
+or `Special:WhatLinksHere`. Follow [API access](references/access.md) for
+compact inspection, name searches, linked items, backlinks, and guidance
+sections. Check local metadata and modeling guidance first. Use browsing tools
+for external evidence, such as publisher catalogs and library records.
+
 Produce an identity decision and source-backed claims within the user's scope.
 Field lists are prompts to consider, not required fields or permission to
 research unrelated facts. For a small addition, inspect the affected entity

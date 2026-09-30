@@ -12,6 +12,7 @@ import httpx
 from pydantic import ValidationError
 
 from .cache import DEFAULT_CACHE, IdCache, case_ids
+from .inspection import summarize_entity
 from .models import load_case, save_case
 from .wikidata import WikidataClient
 from .workflow import (
@@ -97,8 +98,30 @@ def parser() -> argparse.ArgumentParser:
     sub = root.add_subparsers(dest="command", required=True)
     initialize = sub.add_parser("init", help="create an illustrative case template")
     initialize.add_argument("path", type=Path)
-    inspect = sub.add_parser("inspect", help="read one Wikidata item as JSON")
-    inspect.add_argument("qid")
+    inspect = sub.add_parser("inspect", help="read compact item or property statements")
+    inspect.add_argument("qid", help="QID or PID")
+    inspect.add_argument(
+        "--property", dest="properties", action="extend", nargs="+", help="only these PIDs"
+    )
+    inspect.add_argument("--raw", action="store_true", help="full API response")
+    inspect.add_argument("--cache", type=Path, default=DEFAULT_CACHE)
+    search = sub.add_parser("search", help="search entity names and aliases")
+    search.add_argument("query")
+    search.add_argument("--type", choices=["item", "property"], default="item")
+    search.add_argument("--limit", type=int, default=10)
+    search.add_argument("--offset", type=int, default=0)
+    linked = sub.add_parser("linked", help="find incoming statements for one property")
+    linked.add_argument("qid")
+    linked.add_argument("--property", required=True)
+    linked.add_argument("--limit", type=int, default=50)
+    linked.add_argument("--offset", type=int, default=0)
+    backlinks = sub.add_parser("backlinks", help="list incoming item-page links")
+    backlinks.add_argument("qid")
+    backlinks.add_argument("--limit", type=int, default=50)
+    backlinks.add_argument("--cursor")
+    page = sub.add_parser("page", help="list guidance sections or read selected wikitext")
+    page.add_argument("title")
+    page.add_argument("--section", type=int)
     match = sub.add_parser("match", help="search unresolved entities and save candidates")
     match.add_argument("case", type=Path)
     validate = sub.add_parser("validate", help="validate evidence and resolution decisions")
@@ -173,8 +196,36 @@ def main(argv: Sequence[str] | None = None) -> int:
                         )
                     )
         elif args.command == "inspect":
+            if args.raw and args.properties:
+                raise ValueError("Use --property for compact output or --raw for the full response")
+            if args.properties:
+                IdCache._validate_ids(args.properties)
+                if any(not identifier.startswith("P") for identifier in args.properties):
+                    raise ValueError("Expected property IDs for --property")
+            inspection_cache = IdCache(args.cache) if not args.raw else None
             with WikidataClient() as client:
-                print(json.dumps(client.inspect(args.qid), indent=2, ensure_ascii=False))
+                payload = client.inspect(args.qid)
+            result = (
+                summarize_entity(payload, inspection_cache, args.properties)
+                if inspection_cache
+                else payload
+            )
+            print(json.dumps(result, ensure_ascii=False, separators=(",", ":")))
+        elif args.command in {"search", "linked", "backlinks", "page"}:
+            with WikidataClient() as client:
+                if args.command == "search":
+                    result = client.search_page(
+                        args.query, entity_type=args.type, limit=args.limit, offset=args.offset
+                    )
+                elif args.command == "linked":
+                    result = client.linked(
+                        args.qid, args.property, limit=args.limit, offset=args.offset
+                    )
+                elif args.command == "backlinks":
+                    result = client.backlinks(args.qid, limit=args.limit, cursor=args.cursor)
+                else:
+                    result = client.page(args.title, section=args.section)
+            print(json.dumps(result, ensure_ascii=False, separators=(",", ":")))
         elif args.command == "match":
             case = load_case(args.case)
             with WikidataClient() as client:
