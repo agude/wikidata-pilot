@@ -26,6 +26,16 @@ Python package using uv, just, Ruff, strict mypy, pytest, and GitHub Actions.
 
 Use only explicit, supported claim datatypes. Never submit QuickStatements automatically. Review the plan and the generated batch first.
 
+## Request artifacts
+
+Store each request under `requests/<request-name>/`. Keep its case, generated
+plans, source downloads, QS batches, and execution reports together. Use
+`case.json` for the working case and `batches/` for batch files and their case
+snapshots. Number new batches and keep each execution report with its batch.
+Do not overwrite submitted batches or their results. Draft plans may be
+regenerated. Do not commit request files or force-add files from `requests/`.
+The shared `data/wikidata_ids.json` cache and modeling guide remain tracked.
+
 ## Incremental case workflow
 
 From the repository root, inspect only the affected entities and their linked
@@ -34,7 +44,7 @@ external research. Verify support for every new claim, keep the requested
 scope, then regenerate affected outputs once:
 
 ```sh
-just pilot prepare CASE --output PATH.qs
+just pilot prepare requests/REQUEST/case.json --output requests/REQUEST/batches/001-create.qs
 ```
 
 Preparation is offline by default. Add `--snapshot` when current item
@@ -46,7 +56,7 @@ Review the plan, proposal JSON, and QS batch before manual submission.
 1. Read the README case format and initialize a case with the CLI:
 
    ```sh
-   just pilot init CASE.json
+   just pilot init requests/REQUEST/case.json
    ```
 2. Use browsing tools to inspect source pages. Record actual retrieval dates, supporting excerpts, locators, and claim-to-source links. Mark a source verified only after checking the material and each linked claim. Model memory and search snippets are insufficient evidence.
 3. Search unresolved entities with `match`. Inspect candidate items, alternate titles, authors, and external identifiers before recording an identity decision. Keep uncertain matches unresolved and explain conflicts in the case.

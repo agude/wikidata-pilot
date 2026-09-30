@@ -16,25 +16,46 @@ just pilot --help
 ## Quick start
 
 ```sh
-just pilot init bolo.json
-just pilot inspect Q48997316 > collection.json
-just pilot plan bolo.json --snapshot
+just pilot init requests/bolo/case.json
+just pilot inspect Q48997316 > requests/bolo/collection.json
+just pilot plan requests/bolo/case.json --snapshot
 ```
 
 `init` creates an illustrative Bolo case. Its AbeBooks excerpt is explicitly unverified; replace or verify it before marking that source `verified`. The supplied QIDs are candidates to confirm, not assertions that the listed entities or relationships have been independently verified.
 
-An agent researches the book using its browsing tools, records source passages in `bolo.json`, and adds each story as an entity. Set entities needing candidate searches to `unresolved`. The supplied example entities already have QIDs, so `match` skips them. Then run:
+An agent researches the book using its browsing tools, records source passages in `requests/bolo/case.json`, and adds each story as an entity. Set entities needing candidate searches to `unresolved`. The supplied example entities already have QIDs, so `match` skips them. Then run:
 
 ```sh
-just pilot match bolo.json
-# Inspect candidates, record resolution decisions, and verify sources in bolo.json.
-just pilot validate bolo.json
-just pilot prepare bolo.json --output staged.qs
+just pilot match requests/bolo/case.json
+# Inspect candidates, record resolution decisions, and verify sources in requests/bolo/case.json.
+just pilot validate requests/bolo/case.json
+just pilot prepare requests/bolo/case.json --output requests/bolo/batches/001-create.qs
 ```
 
-`validate` and `prepare` fail on the original template until its source is verified. `prepare` writes `bolo.plan.md`, `bolo.plan.json`, and `staged.qs` from the same case. It plans offline by default; add `--snapshot` when current item statements matter or before submission. Review all three files, paste `staged.qs` into QuickStatements 3 using V1 syntax, preview the commands, and run the batch manually. Store the downloaded execution report beside the case. Do not rerun a creation batch after a timeout without checking whether items were created.
+`validate` and `prepare` fail on the original template until its source is verified. `prepare` writes `requests/bolo/case.plan.md`, `requests/bolo/case.plan.json`, and `requests/bolo/batches/001-create.qs` from the same case. It plans offline by default; add `--snapshot` when current item statements matter or before submission. Review all three files, paste `001-create.qs` into QuickStatements 3 using V1 syntax, preview the commands, and run the batch manually. Store the downloaded execution report beside its batch. Do not rerun a creation batch after a timeout without checking whether items were created.
 
 The top-level case object contains `schema_version`, `title`, `sources`, and `entities`. It is UTF-8 JSON validated with Pydantic. Each entity has a local key and a resolution of `unresolved`, `existing` with a QID, or `create`. A `create` decision must include a reason. A no-result search is never proof that an item does not exist; inspect candidates and record the search context in the resolution reason before choosing `create`. Matching checks exact external identifier values before title candidates and title-plus-author candidates. Ambiguous results remain unresolved until a person records a decision.
+
+## Request files
+
+Keep each request in its own local directory:
+
+```text
+requests/
+  bolo/
+    case.json
+    case.plan.md
+    case.plan.json
+    batches/
+      001-create.qs
+      001-results.csv
+```
+
+`/requests/` is ignored by Git. Store source downloads and batch-specific
+case snapshots within the same request directory. Number new batches;
+retain submitted files and execution reports without overwriting them.
+Regenerate draft plans as needed. Keep shared metadata in
+`data/wikidata_ids.json` and reusable guidance in `docs/` tracked.
 
 ## Case format
 
@@ -64,10 +85,10 @@ Claims and qualifiers use explicit datatype sets. Claims require one or more sou
 just pilot cache --find "Keith Laumer"
 # Fetch only missing IDs, in batches of up to 50.
 just pilot cache P50 Q724395
-just pilot cache --case bolo.json
+just pilot cache --case requests/bolo/case.json
 # Explicitly refresh the requested IDs.
-just pilot cache --case bolo.json --refresh
-just pilot plan bolo.json --snapshot
+just pilot cache --case requests/bolo/case.json --refresh
+just pilot plan requests/bolo/case.json --snapshot
 ```
 
 Plans load cached labels automatically and retain the IDs, for example `author (P50)` and `Keith Laumer (Q724395)`. Missing metadata falls back to the ID. Planning does not update the cache; run `cache --case` after adding IDs to a case. Current claim snapshots are always fetched separately with `--snapshot`.

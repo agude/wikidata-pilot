@@ -15,3 +15,6 @@ build/
 
 # uv — .venv is local; uv.lock is committed (do not add it here)
 .venv/
+
+# Per-request research and submission artifacts stay local.
+/requests/
