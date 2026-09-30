@@ -93,56 +93,79 @@ SAMPLE = {
 
 def parser() -> argparse.ArgumentParser:
     root = argparse.ArgumentParser(
-        prog="wikidata-pilot", description="Prepare reviewed, evidence-backed Wikidata edits"
+        prog="wikidata-pilot",
+        description="Prepare reviewed, evidence-backed Wikidata edits",
+        epilog="Reference: docs/commands.md (in the repository)",
     )
     sub = root.add_subparsers(dest="command", required=True)
-    initialize = sub.add_parser("init", help="create an illustrative case template")
+
+    def command(name: str, help: str) -> argparse.ArgumentParser:
+        return sub.add_parser(name, help=help, epilog=f"Reference: docs/commands.md#{name}")
+
+    initialize = command("init", help="create an illustrative case template")
     initialize.add_argument("path", type=Path)
-    inspect = sub.add_parser("inspect", help="read compact item or property statements")
-    inspect.add_argument("qid", help="QID or PID")
+    inspect = command("inspect", help="read compact item or property statements")
+    inspect.add_argument("qids", nargs="+", help="QIDs or PIDs")
     inspect.add_argument(
         "--property", dest="properties", action="extend", nargs="+", help="only these PIDs"
     )
     inspect.add_argument("--raw", action="store_true", help="full API response")
     inspect.add_argument("--cache", type=Path, default=DEFAULT_CACHE)
-    search = sub.add_parser("search", help="search entity names and aliases")
+    search = command("search", help="search entity names and aliases")
     search.add_argument("query")
     search.add_argument("--type", choices=["item", "property"], default="item")
     search.add_argument("--limit", type=int, default=10)
     search.add_argument("--offset", type=int, default=0)
-    linked = sub.add_parser("linked", help="find incoming statements for one property")
+    linked = command("linked", help="find incoming statements for one property")
     linked.add_argument("qid")
     linked.add_argument("--property", required=True)
     linked.add_argument("--limit", type=int, default=50)
     linked.add_argument("--offset", type=int, default=0)
-    backlinks = sub.add_parser("backlinks", help="list incoming item-page links")
+    backlinks = command("backlinks", help="list incoming item-page links")
     backlinks.add_argument("qid")
     backlinks.add_argument("--limit", type=int, default=50)
     backlinks.add_argument("--cursor")
-    page = sub.add_parser("page", help="list guidance sections or read selected wikitext")
+    page = command("page", help="list guidance sections or read selected wikitext")
     page.add_argument("title")
     page.add_argument("--section", type=int)
-    match = sub.add_parser("match", help="search unresolved entities and save candidates")
+    identifier = command("identifier", help="find an exact identifier value")
+    identifier.add_argument("property")
+    identifier.add_argument("value")
+    identifier.add_argument("--limit", type=int, default=10)
+    identifier.add_argument("--offset", type=int, default=0)
+    ancestors = command("ancestors", help="trace class hierarchies")
+    ancestors.add_argument("qid")
+    ancestors.add_argument("--instance-of", action="store_true")
+    ancestors.add_argument("--limit", type=int, default=50)
+    ancestors.add_argument("--offset", type=int, default=0)
+    resolve = command("resolve", help="find an item from a wiki page title")
+    resolve.add_argument("site")
+    resolve.add_argument("title")
+    history = command("history", help="read item or property revision metadata")
+    history.add_argument("id")
+    history.add_argument("--limit", type=int, default=10)
+    history.add_argument("--cursor")
+    match = command("match", help="search unresolved entities and save candidates")
     match.add_argument("case", type=Path)
-    validate = sub.add_parser("validate", help="validate evidence and resolution decisions")
+    validate = command("validate", help="validate evidence and resolution decisions")
     validate.add_argument("case", type=Path)
-    plan = sub.add_parser("plan", help="write before/after proposal review files")
+    plan = command("plan", help="write before/after proposal review files")
     plan.add_argument("case", type=Path)
     plan.add_argument(
         "--snapshot", action="store_true", help="fetch current claims for resolved QIDs"
     )
     plan.add_argument("--output", type=Path, help="Markdown path; defaults beside case")
     plan.add_argument("--cache", type=Path, default=DEFAULT_CACHE)
-    cache = sub.add_parser("cache", help="read or update checked-in ID metadata")
+    cache = command("cache", help="read or update checked-in ID metadata")
     cache.add_argument("ids", nargs="*", help="QIDs and PIDs to fetch if missing")
     cache.add_argument("--case", type=Path, help="also collect IDs from a case")
     cache.add_argument("--find", help="find all exact label or alias matches locally")
     cache.add_argument("--refresh", action="store_true", help="refetch requested IDs")
     cache.add_argument("--file", type=Path, default=DEFAULT_CACHE)
-    export = sub.add_parser("export", help="write staged QuickStatements file")
+    export = command("export", help="write staged QuickStatements file")
     export.add_argument("case", type=Path)
     export.add_argument("--output", type=Path, required=True)
-    prepare = sub.add_parser("prepare", help="validate and render all review outputs")
+    prepare = command("prepare", help="validate and render all review outputs")
     prepare.add_argument("case", type=Path)
     prepare.add_argument("--output", type=Path, required=True, help="staged QuickStatements path")
     prepare.add_argument("--snapshot", action="store_true", help="fetch current claims")
@@ -204,14 +227,32 @@ def main(argv: Sequence[str] | None = None) -> int:
                     raise ValueError("Expected property IDs for --property")
             inspection_cache = IdCache(args.cache) if not args.raw else None
             with WikidataClient() as client:
-                payload = client.inspect(args.qid)
-            result = (
-                summarize_entity(payload, inspection_cache, args.properties)
-                if inspection_cache
-                else payload
-            )
+                payload = (
+                    client.inspect(args.qids[0])
+                    if len(args.qids) == 1
+                    else client.inspect_many(args.qids)
+                )
+            if inspection_cache:
+                entities = payload["entities"]
+                assert isinstance(entities, dict)
+                records = [
+                    summarize_entity({"entities": {key: entity}}, inspection_cache, args.properties)
+                    for key, entity in entities.items()
+                ]
+                result = records[0] if len(args.qids) == 1 else {"entities": records}
+            else:
+                result = payload
             print(json.dumps(result, ensure_ascii=False, separators=(",", ":")))
-        elif args.command in {"search", "linked", "backlinks", "page"}:
+        elif args.command in {
+            "search",
+            "linked",
+            "backlinks",
+            "page",
+            "identifier",
+            "ancestors",
+            "resolve",
+            "history",
+        }:
             with WikidataClient() as client:
                 if args.command == "search":
                     result = client.search_page(
@@ -223,6 +264,18 @@ def main(argv: Sequence[str] | None = None) -> int:
                     )
                 elif args.command == "backlinks":
                     result = client.backlinks(args.qid, limit=args.limit, cursor=args.cursor)
+                elif args.command == "identifier":
+                    result = client.identifier(
+                        args.property, args.value, limit=args.limit, offset=args.offset
+                    )
+                elif args.command == "ancestors":
+                    result = client.ancestors(
+                        args.qid, instance_of=args.instance_of, limit=args.limit, offset=args.offset
+                    )
+                elif args.command == "resolve":
+                    result = client.resolve(args.site, args.title)
+                elif args.command == "history":
+                    result = client.history(args.id, limit=args.limit, cursor=args.cursor)
                 else:
                     result = client.page(args.title, section=args.section)
             print(json.dumps(result, ensure_ascii=False, separators=(",", ":")))

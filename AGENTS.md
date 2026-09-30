@@ -56,12 +56,12 @@ Review the plan, proposal JSON, and QS batch before manual submission.
 
 ## Wikidata access
 
-Use Wikidata APIs for every Wikidata read through `just pilot`: `search`,
-`inspect`, `linked`, `backlinks`, and `page`. Do not browse item or property
-HTML or `Special:WhatLinksHere`. Read the research skill's
-[API access reference](.agents/skills/wikidata-research/references/access.md)
-for command selection and pagination. Use browsing tools for external source
-evidence. Local metadata and modeling guidance remain the first lookup.
+Use Wikidata APIs for every Wikidata read through `just pilot`. Select the
+operation and follow pagination in [docs/commands.md](docs/commands.md);
+command help points to the relevant section. Do not browse item or property
+HTML or `Special:WhatLinksHere`. Use browsing tools for external evidence.
+Check local metadata and modeling guidance first. Inspect candidate identities
+before proposing edits; query results can lag changes.
 
 ## Pilot a research case
 

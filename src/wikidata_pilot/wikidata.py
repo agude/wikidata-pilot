@@ -39,12 +39,20 @@ class WikidataClient:
         return payload
 
     def inspect(self, qid: str) -> dict[str, object]:
-        if not re.fullmatch(r"[QP][1-9][0-9]*", qid):
-            raise ValueError("Expected a Wikidata QID or PID")
+        return self.inspect_many([qid])
+
+    def inspect_many(self, ids: list[str]) -> dict[str, object]:
+        """Fetch a bounded set of records together without updating local files."""
+        if (
+            not ids
+            or len(ids) > 50
+            or any(not re.fullmatch(r"[QP][1-9][0-9]*", identifier) for identifier in ids)
+        ):
+            raise ValueError("Supply 1-50 Wikidata QIDs or PIDs")
         payload = self.request(
             {
                 "action": "wbgetentities",
-                "ids": qid,
+                "ids": "|".join(dict.fromkeys(ids)),
                 "format": "json",
                 "props": "info|labels|descriptions|aliases|datatype|claims|sitelinks",
                 "languages": "en",
@@ -52,9 +60,11 @@ class WikidataClient:
         )
         entities = payload.get("entities")
         if not isinstance(entities, dict) or not entities:
-            raise ValueError(f"Wikidata did not return item {qid}")
-        if any(not isinstance(item, dict) or "missing" in item for item in entities.values()):
-            raise ValueError(f"Wikidata item {qid} is missing")
+            raise ValueError("Wikidata did not return entities")
+        for identifier in ids:
+            item = entities.get(identifier)
+            if not isinstance(item, dict) or "missing" in item:
+                raise ValueError(f"Wikidata item {identifier} is missing")
         return payload
 
     def metadata(self, ids: list[str]) -> dict[str, dict[str, Any]]:
@@ -149,6 +159,40 @@ class WikidataClient:
             "SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. } "
             f"}} ORDER BY ?item LIMIT {limit + 1} OFFSET {offset}"
         )
+        return self._item_query(query, limit, offset)
+
+    def identifier(
+        self, property_id: str, value: str, *, limit: int = 10, offset: int = 0
+    ) -> dict[str, Any]:
+        """Find exact string or external-identifier statements."""
+        _validate_page(limit, offset)
+        if not re.fullmatch(r"P[1-9][0-9]*", property_id) or not value.strip():
+            raise ValueError("Supply a Wikidata property ID and nonempty identifier value")
+        query = (
+            "SELECT DISTINCT ?item ?itemLabel ?itemDescription WHERE { "
+            f"?item wdt:{property_id} {json_literal(value)}. "
+            "SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. } "
+            f"}} ORDER BY ?item LIMIT {limit + 1} OFFSET {offset}"
+        )
+        return self._item_query(query, limit, offset)
+
+    def ancestors(
+        self, qid: str, *, instance_of: bool = False, limit: int = 50, offset: int = 0
+    ) -> dict[str, Any]:
+        """Find superclasses, or the classes of an instance and their superclasses."""
+        _validate_page(limit, offset)
+        if not re.fullmatch(r"Q[1-9][0-9]*", qid):
+            raise ValueError("Expected a class or instance QID")
+        path = "wdt:P31/wdt:P279*" if instance_of else "wdt:P279+"
+        query = (
+            "SELECT DISTINCT ?item ?itemLabel ?itemDescription WHERE { "
+            f"wd:{qid} {path} ?item. FILTER(?item != wd:{qid}) "
+            "SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. } "
+            f"}} ORDER BY ?item LIMIT {limit + 1} OFFSET {offset}"
+        )
+        return self._item_query(query, limit, offset)
+
+    def _item_query(self, query: str, limit: int, offset: int) -> dict[str, Any]:
         response = self.client.get(
             "https://query.wikidata.org/sparql",
             params={"query": query, "format": "json"},
@@ -247,29 +291,91 @@ class WikidataClient:
             result["revision"] = parsed["revid"]
         return result
 
-    def search_identifier(self, property_id: str, identifier: str) -> list[dict[str, str]]:
-        """Find exact property values with Wikidata Query Service."""
-        if not re.fullmatch(r"P[1-9][0-9]*", property_id):
-            raise ValueError("Expected a Wikidata property ID")
-        query = (
-            "SELECT ?item ?itemLabel WHERE { ?item wdt:"
-            f"{property_id} {json_literal(identifier)}. "
-            "SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. } } LIMIT 20"
-        )
-        response = self.client.get(
-            "https://query.wikidata.org/sparql",
-            params={"query": query, "format": "json"},
-            headers={"Accept": "application/sparql+json"},
-        )
-        response.raise_for_status()
-        results = response.json()["results"]["bindings"]
-        return [
+    def resolve(self, site: str, title: str) -> dict[str, Any]:
+        """Resolve one wiki sitelink; an absent result has a null ID."""
+        if not re.fullmatch(r"[a-z][a-z0-9_\-]*", site) or not title.strip() or "|" in title:
+            raise ValueError("Supply a site ID and one nonempty page title")
+        payload = self.request(
             {
-                "id": row["item"]["value"].rsplit("/", 1)[-1],
-                "label": row.get("itemLabel", {}).get("value", ""),
+                "action": "wbgetentities",
+                "sites": site,
+                "titles": title,
+                "props": "labels|descriptions|sitelinks",
+                "languages": "en",
+                "redirects": "yes",
+                "format": "json",
             }
-            for row in results
+        )
+        entities = payload.get("entities")
+        if not isinstance(entities, dict) or len(entities) != 1:
+            raise ValueError("Wikidata sitelink response is malformed")
+        entity = next(iter(entities.values()))
+        if not isinstance(entity, dict):
+            raise ValueError("Wikidata sitelink entity is malformed")
+        result: dict[str, Any] = {"site": site, "requested_title": title, "id": None}
+        if "missing" not in entity:
+            if not isinstance(entity.get("id"), str):
+                raise ValueError("Wikidata sitelink response has no ID")
+            result.update(
+                {
+                    "id": entity["id"],
+                    "label": entity.get("labels", {}).get("en", {}).get("value", ""),
+                    "description": entity.get("descriptions", {}).get("en", {}).get("value", ""),
+                    "title": entity.get("sitelinks", {}).get(site, {}).get("title", title),
+                }
+            )
+        if "redirects" in payload:
+            result["redirects"] = payload["redirects"]
+        return result
+
+    def history(
+        self, identifier: str, *, limit: int = 10, cursor: str | None = None
+    ) -> dict[str, Any]:
+        """Read revision metadata without downloading historical entity content."""
+        _validate_page(limit, 0)
+        if not re.fullmatch(r"[QP][1-9][0-9]*", identifier):
+            raise ValueError("Expected a Wikidata QID or PID")
+        title = f"Property:{identifier}" if identifier.startswith("P") else identifier
+        params = {
+            "action": "query",
+            "prop": "revisions",
+            "titles": title,
+            "rvprop": "ids|timestamp|user|comment",
+            "rvlimit": str(limit),
+            "format": "json",
+            "formatversion": "2",
+        }
+        if cursor is not None:
+            params.update({"rvcontinue": cursor, "continue": "||"})
+        payload: dict[str, Any] = self.request(params)
+        try:
+            pages = payload["query"]["pages"]
+            if not isinstance(pages, list) or len(pages) != 1:
+                raise ValueError("Wikidata history page list is malformed")
+            page = pages[0]
+            revisions = page["revisions"]
+            if (
+                "missing" in page
+                or not isinstance(revisions, list)
+                or any(
+                    not isinstance(revision, dict) or "revid" not in revision
+                    for revision in revisions
+                )
+            ):
+                raise ValueError("Wikidata revisions are unavailable or malformed")
+            continuation = payload.get("continue", {}).get("rvcontinue")
+            if continuation is not None and not isinstance(continuation, str):
+                raise ValueError("Wikidata revision cursor is malformed")
+        except (KeyError, TypeError, AttributeError) as error:
+            raise ValueError("Wikidata history response is malformed") from error
+        return {"id": identifier, "revisions": revisions, "next_cursor": continuation}
+
+    def search_identifier(self, property_id: str, identifier: str) -> list[dict[str, str]]:
+        """Return identifier candidates for the existing case-matching workflow."""
+        results: list[dict[str, str]] = self.identifier(property_id, identifier, limit=20)[
+            "results"
         ]
+        return results
 
 
 def json_literal(value: str) -> str:

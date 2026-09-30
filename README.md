@@ -92,41 +92,17 @@ Claims and qualifiers use explicit datatype sets. Claims require one or more sou
 
 ## Wikidata API access
 
-Use the API commands for all Wikidata reads. Results are compact JSON; these
-commands do not save files or update the metadata cache.
+Use API commands for Wikidata reads and browse external sources for evidence.
+The [command reference](docs/commands.md) covers identifier lookup, batch
+inspection, relationships, class hierarchies, sitelink resolution, history,
+backlinks, and guidance sections, including pagination and failure behavior.
+Every command's `--help` points to its reference section.
 
 ```sh
-just pilot search "Keith Laumer"
-just pilot search "publisher" --type property
-# Find works with author (P50) = Keith Laumer.
-just pilot linked Q724395 --property P50 --limit 10
-# Inspect only the statements needed for this decision.
-just pilot inspect Q48997316 --property P31 P50 P577
-just pilot inspect P123 --property P2302
-# Equivalent to item-page backlinks from Special:WhatLinksHere.
-just pilot backlinks Q1368527 --limit 10
-# List guidance sections, then read the required section by its index.
-just pilot page "Wikidata:WikiProject Books"
-just pilot page "Wikidata:WikiProject Books" --section 0
+just pilot identifier P212 "9780441069972"
+just pilot inspect Q48997316 Q724395 --property P31 P50
+just pilot linked Q724395 --property P50
 ```
-
-`inspect` defaults to all claims, with English metadata and locally cached
-labels. It retains statement IDs, ranks, qualifiers, reference groups, date
-precision, and unknown or absent values. `--property` selects claims;
-`--raw` returns the full fetched API response, including sitelinks. They
-cannot be combined. Live plan snapshots still contain full API payloads.
-
-`search` and `linked` return `next_offset`; repeat the same command with
-`--offset VALUE` until it is null. `backlinks` returns `next_cursor`; pass it
-with `--cursor 'VALUE'` until it is null. Defaults are 10 results for name
-search and 50 for links; `--limit` accepts 1–50. `linked` uses SPARQL to find
-incoming best-ranked statements for a specific property. Backlinks identify
-page links without specifying a relationship. Candidate searches can lag
-recent edits; inspect items before recording an identity decision.
-
-See the [API access reference](.agents/skills/wikidata-research/references/access.md)
-for research procedures and guidance-page retrieval. Continue to browse
-external sources to verify facts.
 
 ## ID metadata cache
 
