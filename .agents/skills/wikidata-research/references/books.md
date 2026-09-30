@@ -14,6 +14,25 @@ not necessarily first publication, authorship, or literary form.
 
 ## Fields to consider
 
+Publisher claims belong to editions. The [P123 conflicts-with
+constraint](https://www.wikidata.org/wiki/Property:P123#constraints) excludes
+items with `P31 = Q7725634` (literary work) or `P31 = Q47461344` (written work).
+Do not add a publisher to those items or change their type to bypass the rule.
+
+Identify the edition described by the source and search for an existing item.
+If none matches and the evidence supports creating one, record a separate
+edition with these claims:
+
+- `P31 = Q3331189` (version, edition or translation).
+- `P123 =` the confirmed publishing house QID.
+- `P629 =` the underlying work QID or its local case key.
+
+Keep the work separate. If the source does not identify an edition, omit the
+publisher claim and record what remains uncertain. Relationships to newly
+created items wait for their returned QIDs. An existing publisher statement on
+a work needs review; this tool cannot delete statements or move them between
+items automatically.
+
 | Subject | Field | Property | Evidence to check |
 |---|---|---|---|
 | Work or collection | Classification | P31 | Subject scope; see the modeling guide |

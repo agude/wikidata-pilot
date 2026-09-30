@@ -20,6 +20,16 @@
       "id": 4,
       "prompt": "Fix the repository's Ruff configuration.",
       "expected_output": "Do not activate the research skill; this is repository tooling work."
+    },
+    {
+      "id": 5,
+      "prompt": "Add the publisher from this edition's copyright page to a work item whose P31 is literary work. No edition item has been identified yet.",
+      "expected_output": "Keep P123 off the literary work. Identify and search for the sourced edition, reusing an existing item or proposing a separate edition only when supported. The edition receives P31 Q3331189, the confirmed publisher P123, and P629 linking to the underlying work. Preserve the work classification and wait for returned QIDs where needed. Do not infer an edition or publishing-house identity from the work title alone."
+    },
+    {
+      "id": 6,
+      "prompt": "The literary work already has a publisher statement. Can the generated batch move it onto an edition?",
+      "expected_output": "Flag the conflicting statement and identify a supported edition before proposing additions there. Explain that the additive exporter cannot remove or move the existing statement. Leave removal for separate review rather than claiming the batch fixes the existing conflict."
     }
   ]
 }
