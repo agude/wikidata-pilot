@@ -116,8 +116,8 @@ def request_json(
             _write_cooldown(cooldown_path, cooldown_at)
             if attempt == MAX_ATTEMPTS:
                 raise RetryBudgetExceeded(
-                    f"{endpoint_key} is cooling down for {delay:.0f}s after the final attempt; "
-                    f"retry after {_format_cooldown(cooldown_at)}"
+                    f"Wikidata {endpoint_key} retries exhausted. Exiting; cooldown saved until "
+                    f"{_format_cooldown(cooldown_at)}. Rerun after that time."
                 )
             waited = _wait(
                 delay,
@@ -194,10 +194,13 @@ def _wait(
     if delay > remaining_budget:
         retry_after = _format_cooldown(cooldown_until)
         raise RetryBudgetExceeded(
-            f"{endpoint_key} requested a {delay:.0f}s cooldown; operation wait budget is "
-            f"{MAX_WAIT_SECONDS:.0f}s. Cooldown was saved until {retry_after}; retry later."
+            f"Wikidata {endpoint_key} cooldown exceeds the remaining wait budget. "
+            f"Exiting; cooldown saved until {retry_after}. Rerun after that time."
         )
-    print(f"Wikidata {endpoint_key} request paused for {delay:.0f}s.", file=sys.stderr)
+    print(
+        f"Wikidata {endpoint_key} cooldown: waiting {delay:.0f}s, then continuing automatically.",
+        file=sys.stderr,
+    )
     sleep(delay)
     return already_waited + delay
 
@@ -218,7 +221,7 @@ def _locked(
             except BlockingIOError as error:
                 if clock() - started >= LOCK_TIMEOUT_SECONDS:
                     raise RetryBudgetExceeded(
-                        "Timed out waiting for another Wikidata request. Retry the command later."
+                        "Timed out waiting for another Wikidata request. Exiting; rerun the command later."
                     ) from error
                 sleep(0.1)
         try:

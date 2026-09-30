@@ -53,7 +53,7 @@ def test_final_attempt_cooldown_persists_and_next_process_honors_it(tmp_path, ca
         return httpx.Response(429, headers={"Retry-After": "7"})
 
     http = httpx.Client(transport=httpx.MockTransport(throttled))
-    with pytest.raises(RetryBudgetExceeded, match="after the final attempt"):
+    with pytest.raises(RetryBudgetExceeded, match=r"retries exhausted\. Exiting"):
         request_json(
             http,
             API,
@@ -65,7 +65,7 @@ def test_final_attempt_cooldown_persists_and_next_process_honors_it(tmp_path, ca
         )
     assert calls == 3
     assert clock.sleeps == [7.0, 7.0]
-    assert capsys.readouterr().err.count("paused for 7s") == 2
+    assert capsys.readouterr().err.count("waiting 7s, then continuing automatically.") == 2
     saved = json.loads((tmp_path / "action.json").read_text())
     assert saved["cooldown_until"] == clock.now + 7
 
@@ -136,7 +136,7 @@ def test_retry_budget_saves_long_cooldown_without_sleep(tmp_path):
     http = httpx.Client(
         transport=httpx.MockTransport(lambda _: httpx.Response(429, headers={"Retry-After": "180"}))
     )
-    with pytest.raises(RetryBudgetExceeded, match="saved until"):
+    with pytest.raises(RetryBudgetExceeded, match="Exiting; cooldown saved until"):
         request_json(
             http,
             API,
@@ -242,7 +242,7 @@ def test_fresh_candidate_bypass_still_obeys_saved_server_cooldown(tmp_path):
 
     client = client_for(tmp_path, httpx.MockTransport(respond), clock)
     client.search_page("Name")
-    with pytest.raises(RetryBudgetExceeded, match="saved until"):
+    with pytest.raises(RetryBudgetExceeded, match="Exiting; cooldown saved until"):
         request_json(
             httpx.Client(
                 transport=httpx.MockTransport(
@@ -256,7 +256,7 @@ def test_fresh_candidate_bypass_still_obeys_saved_server_cooldown(tmp_path):
             sleep=clock.sleep,
             jitter=lambda *_: 0.0,
         )
-    with pytest.raises(RetryBudgetExceeded, match="requested a 180s cooldown"):
+    with pytest.raises(RetryBudgetExceeded, match="cooldown exceeds the remaining wait budget"):
         client.search_page("Name", fresh=True)
     assert calls == 1
 
@@ -478,7 +478,7 @@ def test_cooldown_from_another_process_blocks_network(tmp_path):
 
     with (
         httpx.Client(transport=httpx.MockTransport(respond)) as http,
-        pytest.raises(RetryBudgetExceeded, match="saved until"),
+        pytest.raises(RetryBudgetExceeded, match="Exiting; cooldown saved until"),
     ):
         request_json(http, API, params={}, state_dir=tmp_path, clock=clock.time, sleep=clock.sleep)
     assert calls == []

@@ -38,10 +38,11 @@ cooldowns and locks combined; network response time is separate. It honors
 starting at five seconds with jitter. A recognized outage message waits at
 least 60 seconds. A 503 is retried only when it includes `Retry-After` or
 identifies `maxlag`; query timeouts and other 503 responses fail without
-retry. HTTP 200 Action API `maxlag` errors are retried. Waits are reported on
-stderr. Cooldowns are saved before waiting, including after the last attempt.
-If a requested delay exceeds the wait budget, the command exits with the saved
-cooldown time and a retry-later message.
+retry. HTTP 200 Action API `maxlag` errors are retried. Wait messages on stderr
+state that the script will continue automatically. Cooldowns are saved before
+waiting, including after the last attempt. When retries are exhausted or a
+requested delay exceeds the wait budget, the error states that the script is
+exiting and gives the time after which to rerun the command.
 
 Successful `search`, `identifier`, `linked`, and `ancestors` candidate results
 are cached for five minutes, with a maximum of 128 entries. Expired entries
