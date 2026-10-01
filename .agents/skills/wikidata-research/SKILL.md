@@ -34,10 +34,9 @@ For a small addition, inspect only the affected entity and its linked evidence.
 2. **Check possible matches.** Search cached names and aliases with
    `just pilot cache --find "NAME"`. Use confirmed author or editor Wikidata
    item IDs (QIDs) to search linked works. Use `just pilot match` to find
-   candidates and
-   `just pilot inspect QID` to examine them. Compare authors, alternate titles,
-   publication history, and identifiers. A matching name does not confirm
-   identity, and an empty search does not prove absence; results can lag new
+   candidates and `just pilot inspect QID` to examine them. Compare authors,
+   alternate titles, publication history, and identifiers. A matching name does
+   not confirm identity, and an empty search does not prove absence; results can lag new
    items. Record candidates and explain whether the subject matches an existing
    item (`existing`), needs a new item (`create`), or is uncertain (`unresolved`).
 3. **Find evidence for missing facts.** Use the relevant checklist and local
@@ -47,15 +46,15 @@ For a small addition, inspect only the affected entity and its linked evidence.
    specialist bibliographies. Treat retailer listings and search snippets as
    leads; inspect the source they point to.
 4. **Document each proposed fact.** Record its source URL, actual retrieval date,
-   supporting passage, page or section, and source ID. Link the fact to the
-   source and confirm it supports both the subject and the fact, even if the
-   source was verified for another claim. Preserve conflicts in the match
+   supporting passage, source location (such as a page or section), and source
+   ID. Link the fact to its source and confirm support for the subject and fact,
+   even if the source was verified for another claim. Preserve conflicts in the match
    explanation or source excerpts. Omit unsupported claims. Do not infer exact
    dates, type of writing, or biography from titles, labels, model memory, or
    nearby records.
 5. **Check how to represent the facts.** Follow local modeling rules. Check
    current property definitions or project guidance for unfamiliar relationships
-   or conflicting rules. Cached labels and descriptions help identify items
+   or conflicting rules. Cached labels and descriptions help identify IDs
    but are not evidence. Fetch metadata for new IDs with
    `just pilot cache --case CASE`; use `--refresh` when it needs updating.
 

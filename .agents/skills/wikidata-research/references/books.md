@@ -1,8 +1,8 @@
 # Books, stories, collections, and editions
 
 A work is the creative text; an edition is a particular published version.
-Research only fields relevant to the request and omit unsupported facts. An
-edition's catalog record does not establish every fact about the work.
+Research only relevant fields and omit unsupported facts. An edition's catalog
+record does not establish every fact about the work.
 
 ## Find evidence
 
@@ -24,8 +24,8 @@ work. Keep order qualifiers aligned with the contents list; do not add
 placeholder stories to fill number gaps.
 
 When titles differ between a cover, title page, copyright page, publisher
-catalog, or in-book series list, record each useful wording and its location.
-Explain which one you use as the work title; do not silently combine them.
+catalog, or in-book series list, record each useful form's exact wording and
+location. Explain which one you use as the work title; do not combine them silently.
 Keep a series name and number separate from the title unless the source
 includes them in it. Check membership of a numbered series or subgroup before
 treating it as the same as a broader series or franchise.
@@ -64,9 +64,9 @@ needs review; the tool cannot delete or move statements automatically.
 | Work | Edition or translation | P747 | Specific existing edition |
 | Edition | Edition of | P629 | Confirmed underlying work |
 | Edition | Publication date / place | P577 / P291 | Edition's imprint |
-| Edition | Publisher | P123 | Named publisher, not retailer |
+| Edition | Publisher | P123 | Publisher named in that edition, not retailer |
 | Edition | Cover artist | P110 | Credit for that edition's cover; can differ between editions |
-| Edition | ISBN | P212 / P957 | ISBN-13 / ISBN-10 for that edition |
+| Edition | ISBN | P212 / P957 | ISBN-13 / ISBN-10 for that edition, in the property's required format |
 | Relevant item | Editor / translator | P98 / P655 | Explicit role and work or edition scope |
 
 When an edition links to a work with P629, inspect the work for P747. Add a
@@ -76,15 +76,15 @@ identifies that edition. Check live statements first.
 Use the value types in the [README](../../../../README.md#case-format): QIDs or
 local entity keys for item values, text with a language for titles and
 subtitles, time values for dates, and external IDs for ISBNs. Record contents
-order as a text qualifier attached to the relationship. Do not add checklist
+order as a `string` qualifier attached to the relationship. Do not add checklist
 labels as case fields.
 
 ## ISBNs
 
-Keep ISBN-10 grouping hyphens in P957, such as `0-671-72184-4`; omitting them
-can trigger a format warning. To derive ISBN-13 from ISBN-10, prefix `978` to
-the first nine digits and calculate a new check digit; never reuse the ISBN-10
-check digit. Verify both check digits and prefer a printed ISBN-13. Books
+Keep ISBN-10 grouping hyphens in P957 (for example, `0-671-72184-4`); missing
+hyphens can trigger a format warning. To derive ISBN-13 from ISBN-10, prefix
+`978` to the first nine digits and recalculate the check digit. Never reuse the
+ISBN-10 check digit. Verify both check digits and prefer printed ISBN-13. Books
 first published from 2007 onward use ISBN-13, including `979` prefixes; use
 the printed ID instead of synthesizing ISBN-10.
 
@@ -96,6 +96,5 @@ Follow the [guide to representing items](../../../../docs/modeling.md).
 Stop when the requested facts have evidence or a documented conflict; do not
 research every checklist field just to fill the table.
 
-Property uses were checked on 2026-09-29 against [WikiProject
-Books](https://www.wikidata.org/wiki/Wikidata:WikiProject_Books) and linked
-definitions. Check current guidance for cases outside these rules.
+Property uses were checked on 2026-09-29 against [WikiProject Books](https://www.wikidata.org/wiki/Wikidata:WikiProject_Books)
+and linked definitions. Check current guidance for cases outside these rules.
