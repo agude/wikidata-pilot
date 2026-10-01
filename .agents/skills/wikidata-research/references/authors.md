@@ -1,40 +1,52 @@
 # Authors
 
-Use this checklist for person identity or requested biographical additions.
-Do not expand a book task into a biography task because an author lacks fields.
+Use this checklist to identify a person or research requested biographical
+facts. A book request does not become a biography request because author
+fields are missing.
 
-## Resolve the person first
+## Identify the person
 
-Start with a supplied or previously confirmed QID. For namesakes, compare
-credited works, dates, pseudonyms, and authority records. A matching name or
-occupation is insufficient. Confirm that an authority record describes this
-person rather than a namesake, organization, or combined record. The confirmed
-QID anchors subsequent searches for the author's works.
+Start with a supplied or confirmed Wikidata item ID (QID). For people with the
+same name, compare credited works, dates, pen names, and library records.
+A matching name or occupation is insufficient. Make sure each record describes
+this person, not a namesake, organization, or several people together. Use the
+confirmed QID to search the author's works.
 
-Prefer publisher/author biographies, library authority records, and reliable
-biographical references. Record support for each proposed fact. Preserve
-conflicting dates; do not average them or silently choose the more precise
-source. Leave missing dates out.
+Prefer publisher or author biographies, library records, and reliable
+biographical sources. Record evidence for each fact. Preserve conflicting
+dates; do not average them or silently choose the more precise one. Omit
+missing dates.
+
+When creating a person item, check relevant authority IDs even if the request
+is about a work. For specialist databases such as ISFDB, follow the author's
+profile from a known work when possible and compare its bibliography with the
+source byline. Treat name-search results as leads. Add an ID only when the
+records identify the same person; cite the profile or ID record and the
+supporting identity evidence. An empty search, timeout, rate limit, or
+unavailable page does not establish that no ID exists.
 
 ## Fields to consider
 
 | Field | Property / case field | Evidence to check |
 |---|---|---|
 | Name and identification | `label`, `description` | Established name and supported description |
-| Human classification | P31 = Q5 | Person, not a shared persona or organization |
+| Person type | P31 = Q5 | Person, not an organization or an identity shared by several people |
 | Occupation | [P106](https://www.wikidata.org/wiki/Property:P106) | Explicit occupation |
-| Pseudonym | [P742](https://www.wikidata.org/wiki/Property:P742) | Source linking the name to the person |
-| Birth / death | [P569](https://www.wikidata.org/wiki/Property:P569) / [P570](https://www.wikidata.org/wiki/Property:P570) | Date and supported precision |
-| Citizenship | [P27](https://www.wikidata.org/wiki/Property:P27) | Explicit citizenship; language/residence is insufficient |
-| Authority identifier | [P214](https://www.wikidata.org/wiki/Property:P214), [P213](https://www.wikidata.org/wiki/Property:P213), [P244](https://www.wikidata.org/wiki/Property:P244), [P227](https://www.wikidata.org/wiki/Property:P227) | VIAF, ISNI, LCCN, or GND identity record |
+| Pen name | [P742](https://www.wikidata.org/wiki/Property:P742) | Source linking the name to the person |
+| Birth / death | [P569](https://www.wikidata.org/wiki/Property:P569) / [P570](https://www.wikidata.org/wiki/Property:P570) | Supported date and precision |
+| Citizenship | [P27](https://www.wikidata.org/wiki/Property:P27) | Explicit citizenship; language or residence is insufficient |
+| Authority ID | [P214](https://www.wikidata.org/wiki/Property:P214), [P213](https://www.wikidata.org/wiki/Property:P213), [P244](https://www.wikidata.org/wiki/Property:P244), [P227](https://www.wikidata.org/wiki/Property:P227), [P1233](https://www.wikidata.org/wiki/Property:P1233) | VIAF, ISNI, LCCN, GND, or ISFDB for speculative-fiction authors |
 
-Classification, occupation, and citizenship use item values; pseudonyms use
-strings; dates use time; authority identifiers use external IDs. The case's
-`identifiers` map supplies search hints; add sourced claims separately when
-proposing identifiers for Wikidata. P50 belongs on the authored work, pointing
-to the person. A pen name alone does not justify creating a second person.
-Collect alias evidence for identity checks; the current exporter does not emit
-aliases, so do not add an `aliases` case field.
+## Record the facts
 
-Property roles checked 2026-09-29 against the linked Wikidata definitions.
-Inspect current constraints for shared pseudonyms or conflicting authority records.
+Use the value types in the [README](../../../../README.md#case-format): item
+IDs for person type, occupation, and citizenship; strings for pen names; time
+values for birth and death; external IDs for authority records. The case's
+`identifiers` map helps find matches; add a separate sourced claim when
+proposing an ID. Put P50 on the authored work, pointing to the person. A pen
+name alone does not justify a second person item. Collect alternative names
+for identity checks. The tool does not export them, so do not add an `aliases`
+case field.
+
+Property uses were checked on 2026-09-29 against the linked definitions.
+Check current rules for shared pen names or conflicting library records.
