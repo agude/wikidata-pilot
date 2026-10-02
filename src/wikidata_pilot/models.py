@@ -45,7 +45,7 @@ class Qualifier(StrictModel):
 class Claim(StrictModel):
     id: str
     property: str = Field(pattern=r"^P[1-9][0-9]*$")
-    datatype: Literal["item", "string", "external-id", "time", "monolingualtext"]
+    datatype: Literal["item", "string", "external-id", "time", "monolingualtext", "url"]
     value: str
     language: str | None = None
     precision: Literal["year", "month", "day"] | None = None
@@ -60,6 +60,8 @@ class Claim(StrictModel):
             raise ValueError("time claims require precision year, month, or day")
         if self.datatype == "time":
             parse_time(self.value, self.precision or "day")
+        if self.datatype == "url":
+            HttpUrl(self.value)
         if self.datatype == "item" and not re.fullmatch(
             r"Q[1-9][0-9]*|[a-z][a-z0-9-]*", self.value
         ):

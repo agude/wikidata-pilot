@@ -269,7 +269,14 @@ def export_case(case: Case) -> str:
                 for key in referenced_keys
             ):
                 continue
-            if claim.datatype not in {"item", "string", "external-id", "time", "monolingualtext"}:
+            if claim.datatype not in {
+                "item",
+                "string",
+                "external-id",
+                "time",
+                "monolingualtext",
+                "url",
+            }:
                 raise ValueError(
                     f"{entity.key}.{claim.id}: export does not support {claim.datatype}"
                 )

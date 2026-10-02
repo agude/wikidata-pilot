@@ -17,4 +17,6 @@ uncertain, leave the publisher claim out. Existing conflicting statements need
 separate review because the exporter only adds statements. Checked 2026-09-29
 against P123 and the Books project's edition guidance.
 
+For an online edition or version whose full text is available on a web page, use P953 (“work available at URL”) on that edition item. Retain the page as a reference for the URL claim and for facts documented by the page. Checked 2026-10-01 against P953 metadata.
+
 Recheck this guide when case evidence conflicts with it or the work falls outside these examples. Metadata labels and property definitions guide modeling; they do not support facts about a specific work.
