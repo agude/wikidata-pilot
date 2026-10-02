@@ -12,9 +12,10 @@ Check local metadata and modeling guidance first. Use browsing tools for
 external evidence, such as publisher catalogs and library records.
 
 The JSON case records entities (people, works, collections, or editions) and
-claims (proposed statements). Propose only facts supported by sources.
-Field lists are optional prompts, not permission to research unrelated facts.
-For a small addition, inspect only the affected entity and its linked evidence.
+claims (proposed statements). Most facts should be supported by sources, but
+some do not need them because they are self evident. Field lists are optional
+prompts, not permission to research unrelated facts. For a small addition,
+inspect only the affected entity and its linked evidence.
 
 ## Use enough evidence for the requested entry
 
