@@ -1,4 +1,36 @@
 {
+  "P106": {
+    "label": "occupation",
+    "description": "occupation of a person. See also \"field of work\" (Property:P101), \"position held\" (Property:P39). Not for groups of people. There, use \"field of work\" (Property:P101), \"industry\" (Property:P452), \"members have occupation\" (Property:P3989).",
+    "aliases": [
+      "profession",
+      "job",
+      "work",
+      "career",
+      "employment",
+      "craft",
+      "employ",
+      "vocation",
+      "avocation"
+    ],
+    "datatype": "wikibase-item",
+    "retrieved": "2026-09-30"
+  },
+  "P110": {
+    "label": "illustrator",
+    "description": "person drawing the pictures or taking the photographs in a book or similar work",
+    "aliases": [
+      "illustration by",
+      "illustrated by",
+      "drawing by",
+      "drawings by",
+      "drawn by",
+      "draftsperson",
+      "artist"
+    ],
+    "datatype": "wikibase-item",
+    "retrieved": "2026-09-30"
+  },
   "P123": {
     "label": "publisher",
     "description": "organization or person responsible for publishing a work, such as a book, periodical, printed music, podcast, game or software",
@@ -14,6 +46,38 @@
       "music publisher",
       "printed music publisher",
       "sheet music publisher"
+    ],
+    "datatype": "wikibase-item",
+    "retrieved": "2026-09-29"
+  },
+  "P1233": {
+    "label": "ISFDB author ID",
+    "description": "identifier for a person in the Internet Speculative Fiction Database",
+    "aliases": [
+      "ISFDB ID",
+      "Internet Speculative Fiction Database author ID",
+      "The Internet Speculative Fiction Database author ID"
+    ],
+    "datatype": "external-id",
+    "retrieved": "2026-09-30"
+  },
+  "P136": {
+    "label": "genre",
+    "description": "creative work's genre or an artist's field of work (P101). Use main subject (P921) to relate creative works to their topic",
+    "aliases": [
+      "music genre",
+      "film genre",
+      "artistic genre",
+      "literary genre",
+      "kind of music",
+      "type of film",
+      "genre of music",
+      "type of music",
+      "art style",
+      "genres",
+      "genre of literature",
+      "map genre",
+      "atlas genre"
     ],
     "datatype": "wikibase-item",
     "retrieved": "2026-09-29"
@@ -78,12 +142,121 @@
     "datatype": "string",
     "retrieved": "2026-09-29"
   },
+  "P155": {
+    "label": "follows",
+    "description": "immediately prior item in a series of which the subject is a part, preferably use as qualifier of P179 [if the subject has replaced the preceding item, e.g. political offices, use \"replaces\" (P1365)]",
+    "aliases": [
+      "succeeds to",
+      "previous is",
+      "before was",
+      "predecessor",
+      "preceded by",
+      "prequel is",
+      "sequel of",
+      "split from",
+      "comes after",
+      "successor to",
+      "succeeds",
+      "prev",
+      "previous element",
+      "is after",
+      "successor of"
+    ],
+    "datatype": "wikibase-item",
+    "retrieved": "2026-09-30"
+  },
+  "P156": {
+    "label": "followed by",
+    "description": "immediately following item in a series of which the subject is a part, preferably use as qualifier of P179 [if the subject has been replaced, e.g. political offices, use \"replaced by\" (P1366)]",
+    "aliases": [
+      "continued as",
+      "prequel of",
+      "next is",
+      "precedes",
+      "sequel is",
+      "successor",
+      "comes before",
+      "next",
+      "next element",
+      "then",
+      "succeeded by"
+    ],
+    "datatype": "wikibase-item",
+    "retrieved": "2026-09-30"
+  },
+  "P179": {
+    "label": "part of the series",
+    "description": "series which contains the subject",
+    "aliases": [
+      "part of series",
+      "series",
+      "listed in",
+      "collection",
+      "issue of",
+      "episode of",
+      "subseries",
+      "video game series",
+      "in series"
+    ],
+    "datatype": "wikibase-item",
+    "retrieved": "2026-09-30"
+  },
+  "P1810": {
+    "label": "subject named as",
+    "description": "name by which a subject is recorded in a database, mentioned as a contributor of a work, or is referred to in a particular context",
+    "aliases": [
+      "AAP",
+      "credited as",
+      "subject stated as",
+      "authorized as",
+      "authorized access point",
+      "established as",
+      "authorized form",
+      "authorized heading",
+      "established form",
+      "established heading",
+      "spelled as",
+      "entity named as",
+      "named as",
+      "stated as",
+      "cited in source as",
+      "was called",
+      "called",
+      "named",
+      "referred to as",
+      "sna"
+    ],
+    "datatype": "string",
+    "retrieved": "2026-09-30"
+  },
   "P212": {
     "label": "ISBN-13",
     "description": "identifier for a book (edition), thirteen digit",
     "aliases": [],
     "datatype": "external-id",
     "retrieved": "2026-09-29"
+  },
+  "P2671": {
+    "label": "Google Knowledge Graph ID",
+    "description": "identifier for Google Knowledge Graph API, starting with \"/g/\". For IDs starting with \"/m/\", use Freebase ID (P646)",
+    "aliases": [
+      "Google Knowledge Panel ID",
+      "kgmid",
+      "Google knowledge panel",
+      "MREID"
+    ],
+    "datatype": "external-id",
+    "retrieved": "2026-10-01"
+  },
+  "P2963": {
+    "label": "Goodreads author ID",
+    "description": "identifier of an author on the Goodreads website",
+    "aliases": [
+      "Good Reads author ID",
+      "GR author ID"
+    ],
+    "datatype": "external-id",
+    "retrieved": "2026-09-30"
   },
   "P31": {
     "label": "instance of",
@@ -105,6 +278,48 @@
     "datatype": "wikibase-item",
     "retrieved": "2026-09-29"
   },
+  "P345": {
+    "label": "IMDb ID",
+    "description": "identifier for the IMDb (with prefix 'tt', 'nm', 'co', 'ev', 'ch' or 'ni')",
+    "aliases": [
+      "Internet Movie Database identifier",
+      "IMDb identifier"
+    ],
+    "datatype": "external-id",
+    "retrieved": "2026-09-30"
+  },
+  "P3913": {
+    "label": "MobyGames person ID",
+    "description": "ID of person in the database at MobyGames",
+    "aliases": [
+      "mobygames.com developer ID",
+      "MobyGames person ID"
+    ],
+    "datatype": "external-id",
+    "retrieved": "2026-09-30"
+  },
+  "P407": {
+    "label": "language of work or name",
+    "description": "language associated with this creative work (such as books, shows, songs, broadcasts or websites) or a name (for persons use \"native language\" (P103) and \"languages spoken, written or signed\" (P1412))",
+    "aliases": [
+      "broadcasting language",
+      "audio language",
+      "available in",
+      "language of work",
+      "language of the reference",
+      "language of website",
+      "language of URL",
+      "used language",
+      "language of the name",
+      "language of name",
+      "language of spoken text",
+      "named in language",
+      "language",
+      "language of object"
+    ],
+    "datatype": "wikibase-item",
+    "retrieved": "2026-10-01"
+  },
   "P50": {
     "label": "author",
     "description": "main creator(s) of a written work (use on works, not humans); use P2093 (author name string) when Wikidata item is unknown or does not exist",
@@ -118,6 +333,59 @@
     ],
     "datatype": "wikibase-item",
     "retrieved": "2026-09-29"
+  },
+  "P527": {
+    "label": "has part(s)",
+    "description": "part of this subject; inverse property of \"part of\" (P361). See also \"has parts of the class\" (P2670).",
+    "aliases": [
+      "formed from",
+      "formed out of",
+      "assembled from",
+      "assembled out of",
+      "created from",
+      "created out of",
+      "amalgamation of",
+      "set of",
+      "consists of",
+      "holonym of",
+      "parts",
+      "comprised of",
+      "includes part",
+      "has as part",
+      "has component",
+      "have part",
+      "composed of",
+      "has ingredient",
+      "has ingredients",
+      "ingredients",
+      "contain",
+      "contains",
+      "has member",
+      "has branch",
+      "divided by",
+      "incorporates",
+      "had part",
+      "has parts",
+      "has part",
+      "has part or parts",
+      "made up of",
+      "includes"
+    ],
+    "datatype": "wikibase-item",
+    "retrieved": "2026-09-30"
+  },
+  "P5749": {
+    "label": "Amazon Standard Identification Number",
+    "description": "identifier for a product on Amazon.com websites",
+    "aliases": [
+      "ASIN",
+      "Amazon.com ID",
+      "Amazon Music release ID",
+      "Amazon Music album ID",
+      "dp number"
+    ],
+    "datatype": "external-id",
+    "retrieved": "2026-10-01"
   },
   "P577": {
     "label": "publication date",
@@ -164,6 +432,143 @@
     ],
     "datatype": "time",
     "retrieved": "2026-09-29"
+  },
+  "P629": {
+    "label": "version, edition or translation of",
+    "description": "is a version, edition or translation of this entity",
+    "aliases": [
+      "edition of",
+      "version of",
+      "edition, version, or translation of",
+      "translation or edition of",
+      "is an edition or translation of",
+      "is an edition of",
+      "is a translation of",
+      "translation of"
+    ],
+    "datatype": "wikibase-item",
+    "retrieved": "2026-09-30"
+  },
+  "P646": {
+    "label": "Freebase ID",
+    "description": "Machine Identifier (MID) for a topic in the former Freebase knowledge graph; new Freebase MIDs are no longer issued, but existing /m/ identifiers remain in use, including by Google Knowledge Graph",
+    "aliases": [
+      "Freebase identifier",
+      "MID",
+      "Freebase",
+      "FID"
+    ],
+    "datatype": "external-id",
+    "retrieved": "2026-10-01"
+  },
+  "P648": {
+    "label": "Open Library ID",
+    "description": "identifier for a work (\"W\"), edition (\"M\") or author (\"A\") for book data of the Internet Archive",
+    "aliases": [
+      "OLID",
+      "OL ID",
+      "OpenLibrary ID",
+      "OpenLibrary identifier",
+      "Open Library identifier",
+      "Open Library author ID",
+      "OpenLibrary author ID",
+      "Open Library book ID",
+      "OpenLibrary book ID",
+      "Open Library work ID",
+      "OpenLibrary work ID"
+    ],
+    "datatype": "external-id",
+    "retrieved": "2026-09-30"
+  },
+  "P747": {
+    "label": "has version, edition or translation",
+    "description": "item that is an edition or translation of this item",
+    "aliases": [
+      "editions",
+      "translation(s)",
+      "edition",
+      "has translation",
+      "has edition",
+      "version",
+      "has version",
+      "released as",
+      "edition or translation",
+      "has edition, version, or translation",
+      "edition, version, or translation",
+      "has arrangement",
+      "has modified version",
+      "arrangement",
+      "arranged as",
+      "modified as",
+      "has translation or edition"
+    ],
+    "datatype": "wikibase-item",
+    "retrieved": "2026-10-01"
+  },
+  "P7937": {
+    "label": "form of creative work",
+    "description": "structure of a creative work",
+    "aliases": [
+      "literary form",
+      "artistic form",
+      "album type",
+      "album format",
+      "creative format",
+      "creative form",
+      "format of creative work",
+      "physical format",
+      "painted format (landscape, portrait, tondo)",
+      "song type",
+      "type of creative work",
+      "type of reference work",
+      "artform",
+      "work type",
+      "work form",
+      "art form",
+      "creative work form",
+      "type of work",
+      "form of work",
+      "form of art"
+    ],
+    "datatype": "wikibase-item",
+    "retrieved": "2026-09-29"
+  },
+  "P800": {
+    "label": "notable work",
+    "description": "notable scientific, artistic or literary work, or other work of significance among subject's works",
+    "aliases": [
+      "major works",
+      "famous works",
+      "significant works",
+      "notable books",
+      "famous books",
+      "representative work",
+      "literary works",
+      "bibliography",
+      "work",
+      "works",
+      "known for",
+      "famous for",
+      "significance",
+      "artwork",
+      "creator of",
+      "representative of artwork type",
+      "they wrote",
+      "they designed",
+      "they discovered",
+      "they invented",
+      "they created",
+      "author of",
+      "writer of",
+      "wrote",
+      "books by",
+      "founder of",
+      "founded",
+      "main work",
+      "principal works"
+    ],
+    "datatype": "wikibase-item",
+    "retrieved": "2026-09-30"
   },
   "P813": {
     "label": "retrieved",
@@ -252,6 +657,35 @@
     "datatype": "wikibase-item",
     "retrieved": "2026-09-29"
   },
+  "P953": {
+    "label": "work available at URL",
+    "description": "URL of a web page containing this work",
+    "aliases": [
+      "online version",
+      "archived at",
+      "available at",
+      "text at",
+      "URL for full text",
+      "fulltext",
+      "text mirror url",
+      "online mirror",
+      "full text available at",
+      "ebook",
+      "ebook URL",
+      "transcription",
+      "article at",
+      "document at",
+      "paper at",
+      "full text at",
+      "full text available at URL",
+      "full text url",
+      "available at URL",
+      "full work available online at",
+      "archives at"
+    ],
+    "datatype": "url",
+    "retrieved": "2026-10-01"
+  },
   "P957": {
     "label": "ISBN-10",
     "description": "former identifier for a book (edition), ten digits. Used for all publications up to 2006 (convertible to ISBN-13 for some online catalogs; useful for old books or fac-similes not reedited since 2007)",
@@ -264,6 +698,278 @@
     "datatype": "external-id",
     "retrieved": "2026-09-29"
   },
+  "P98": {
+    "label": "editor",
+    "description": "person who checks and corrects a work (such as a book, newspaper, academic journal, etc.) to comply with a rules of certain genre. Also applies to person who establishes the text of an ancient written work or manuscript.",
+    "aliases": [
+      "edited by",
+      "associate editor",
+      "eds.",
+      "ed.",
+      "series editor",
+      "editorial director",
+      "compiled by",
+      "publication director"
+    ],
+    "datatype": "wikibase-item",
+    "retrieved": "2026-09-30"
+  },
+  "Q100437175": {
+    "label": "In the Flesh",
+    "description": "",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q100934917": {
+    "label": "Ghosts",
+    "description": "vocal track by Bruce Springsteen; 2020 studio recording",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q1025082": {
+    "label": "Cadbury Castle",
+    "description": "hillfort in Somerset, England, UK",
+    "aliases": [
+      "Cadbury Castle, South Cadbury",
+      "South Cadbury",
+      "South Cadbury Castle",
+      "Large multivallate hillfort and associated earthworks at South Cadbury",
+      "Camelot",
+      "Cadbury Castle (South Cadbury)"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q1028491": {
+    "label": "Camelot",
+    "description": "stage musical",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q1028495": {
+    "label": "Camelot",
+    "description": "historical-fantasy-drama television series",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q1033951": {
+    "label": "device driver",
+    "description": "computer program that operates or controls a particular type of device",
+    "aliases": [
+      "driver",
+      "driver software"
+    ],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q10349745": {
+    "label": "racing automobile driver",
+    "description": "occupation driving an automobile in competition",
+    "aliases": [
+      "racing driver",
+      "race car driver",
+      "driver of racing automobiles",
+      "auto racing driver",
+      "racecar driver",
+      "automobile racing driver",
+      "racing car driver"
+    ],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q104843785": {
+    "label": "The Difference",
+    "description": "2020 song by Flume with Toro y Moi",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q105279769": {
+    "label": "",
+    "description": "American painter",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q105420": {
+    "label": "anthology",
+    "description": "collection of written creative works chosen by the compiler",
+    "aliases": [
+      "compilation"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q105498497": {
+    "label": "Gorgé",
+    "description": "family name",
+    "aliases": [
+      "Gorgé (family name)",
+      "Gorgé (surname)"
+    ],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q105722561": {
+    "label": "A Desolation Called Peace",
+    "description": "2021 novel by Arkady Martine",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q106566162": {
+    "label": "The Event",
+    "description": "painting by Miodrag Mladovic",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q106926087": {
+    "label": "Ghosts",
+    "description": "2022 video game",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q106988964": {
+    "label": "qntm",
+    "description": "British science fiction author",
+    "aliases": [
+      "Sam Hughes",
+      "quantum"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q107122133": {
+    "label": "Ghosts",
+    "description": "2021 American television series",
+    "aliases": [
+      "Ghosts US"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q107391844": {
+    "label": "Isabel Fall",
+    "description": "American writer",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q108329152": {
+    "label": "collection of literary works",
+    "description": "selected and ordered group of literary works",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q110265383": {
+    "label": "The Colonel",
+    "description": "character from Dennis and Gnasher",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q110340909": {
+    "label": "The Ploughshare",
+    "description": "publication of the Society of Friends (\"Quakers\")",
+    "aliases": [
+      "Ploughshare, The"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q113554": {
+    "label": "Barry N. Malzberg",
+    "description": "American novelist, short story writer",
+    "aliases": [
+      "Barry Norman Malzberg",
+      "Barry Nathaniel Malzberg",
+      "Nathan Herbert",
+      "Barry Malzberg",
+      "K. M. O'Donnell"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q114088741": {
+    "label": "The Difference",
+    "description": "original song written and composed by Jakob Dylan; first recorded and released by The Wallflowers",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q114096892": {
+    "label": "The Difference",
+    "description": "1997 official music video by The Wallflowers; directed by Ken Fox",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q1144668": {
+    "label": "livarot",
+    "description": "French cheese originating in the commune of Livarot",
+    "aliases": [
+      "Livarot cheese",
+      "The Colonel"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q114475405": {
+    "label": "The Colonel",
+    "description": "episode of Gunsmoke (S20 E13)",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q114493557": {
+    "label": "The Colonel",
+    "description": "episode of Home Improvement (S3 E16)",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q115193536": {
+    "label": "Helen Hindpere",
+    "description": "Estonian writer (born 1995)",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q116146377": {
+    "label": "Lena",
+    "description": "",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q1164745": {
+    "label": "The Event",
+    "description": "television series",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q116695535": {
+    "label": "Lost legions",
+    "description": "Wikimedia disambiguation page",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q1181143": {
+    "label": "Dean Wesley Smith",
+    "description": "American science fiction author (born 1950)",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
   "Q11872782": {
     "label": "Final Mission",
     "description": "1984 film directed by Cirio H. Santiago",
@@ -271,9 +977,77 @@
     "datatype": null,
     "retrieved": "2026-09-29"
   },
+  "Q121790840": {
+    "label": "John DeCamp",
+    "description": "American poet (born 1935)",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
   "Q122376295": {
     "label": "Final Missions",
     "description": "2018 video game",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q122386894": {
+    "label": "Gorge",
+    "description": "2021 video game",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q122825625": {
+    "label": "The Events at Unity Farm",
+    "description": "2023 early access video game",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q123521638": {
+    "label": "Home: Habitat, Range, Niche, Territory",
+    "description": "2021 science fiction short story by Martha Wells",
+    "aliases": [
+      "Home"
+    ],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q123682427": {
+    "label": "There Is No Antimemetics Division",
+    "description": "web serial by qntm, first serialized online between 2015 and 2020, published in book form in 2021 and in a revised version in 2025",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q123817592": {
+    "label": "Gorge",
+    "description": "given name",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q124059693": {
+    "label": "In the Flesh",
+    "description": "1987 Poseidon edition",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q12522885": {
+    "label": "Lena",
+    "description": "village in Poso Regency, Central Sulawesi, Indonesia",
+    "aliases": [
+      "Lena, North Pamona, Poso",
+      "Lena Village"
+    ],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q125847072": {
+    "label": "You're It / Holes",
+    "description": "episode of The Cat in the Hat Knows a Lot About That! (S3 E11)",
     "aliases": [],
     "datatype": null,
     "retrieved": "2026-09-29"
@@ -285,9 +1059,137 @@
     "datatype": null,
     "retrieved": "2026-09-29"
   },
+  "Q1279564": {
+    "label": "short story collection",
+    "description": "book containing several short stories by a single author",
+    "aliases": [
+      "group of short stories",
+      "collection of short stories",
+      "collection of short works",
+      "volume of short stories"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q129999910": {
+    "label": "You're It",
+    "description": "episode of Craig of the Creek (S1 E2)",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q131382888": {
+    "label": "Shards of Earth",
+    "description": "2021 novel by Adrian Tchaikovsky",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q131382897": {
+    "label": "Eyes of the Void",
+    "description": "2022 novel by Adrian Tchaikovsky",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q131382911": {
+    "label": "Lords of Uncreation",
+    "description": "2023 novel by Adrian Tchaikovsky",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q131472463": {
+    "label": "The Colonel",
+    "description": "2014 novelette by Peter Watts",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q132197014": {
+    "label": "John Mina",
+    "description": "American law enforcement officer (born 1968)",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q132311": {
+    "label": "fantasy",
+    "description": "genre of speculative fiction set in a fictional universe, often inspired by real world myth and folklore",
+    "aliases": [
+      "fantasy fiction"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q1327861": {
+    "label": "1998 bombing of Iraq",
+    "description": "bombardment of Iraq by the USA and the UK in December 1998",
+    "aliases": [
+      "Operation Desert Fox"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
   "Q132831026": {
     "label": "Final Mission",
     "description": "Wikimedia disambiguation page",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q133191732": {
+    "label": "Ghosts",
+    "description": "German television series",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q133306305": {
+    "label": "All These Worlds",
+    "description": "2017 Bobiverse novel by Dennis E. Taylor",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q133445083": {
+    "label": "Penguin Random House Audio",
+    "description": "Audiobook publishing arm of Penguin Random House",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q133775124": {
+    "label": "Scott Warren",
+    "description": "Science fiction and fantasy author",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q134481106": {
+    "label": "A Drop of Corruption",
+    "description": "2025 novel by Robert Jackson Bennett",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q134525266": {
+    "label": "Heaven's River",
+    "description": "2020 Bobiverse novel by Dennis E. Taylor",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q134525267": {
+    "label": "Not Till We Are Lost",
+    "description": "2024 Bobiverse novel by Dennis E. Taylor",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q134733117": {
+    "label": "Though Hell Should Bar the Way",
+    "description": "novel by Linda Evans",
     "aliases": [],
     "datatype": null,
     "retrieved": "2026-09-29"
@@ -322,12 +1224,526 @@
     "datatype": null,
     "retrieved": "2026-09-29"
   },
+  "Q135027319": {
+    "label": "Honor of the Regiment",
+    "description": "1993 anthology of Bolo stories",
+    "aliases": [
+      "Bolos Book 1: Honor of the Regiment"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q135031833": {
+    "label": "The Event",
+    "description": "video game developed by Lazy Games",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q135046422": {
+    "label": "Lost Legions",
+    "description": "video game developed by Tarock Interactive",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q135380630": {
+    "label": "Fine Structure",
+    "description": "novel by Sam Hughes",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q136209182": {
+    "label": "",
+    "description": "book 2013",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q1368134": {
+    "label": "Steve Perry",
+    "description": "American writer",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q1368527": {
+    "label": "S. M. Stirling",
+    "description": "Canadian-American author, primarily of speculative fiction",
+    "aliases": [
+      "Stephen Michael Stirling",
+      "S.M. Stirling"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q137785134": {
+    "label": "Ra",
+    "description": "2013 book",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q137844422": {
+    "label": "Brothers",
+    "description": "1987 Warner Books edition",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q138005166": {
+    "label": "Ghosts",
+    "description": "episode of Virgin River (S6 E6)",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q138497553": {
+    "label": "A Mote in Shadow",
+    "description": "Science fiction novel",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q138634286": {
+    "label": "There Is No Antimemetics Division",
+    "description": "2025 science fiction novel by qntm",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q139772829": {
+    "label": "Ploughshares into Swords",
+    "description": "",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q140005587": {
+    "label": "In the Flesh",
+    "description": "book published by Palgrave Macmillan US (2003)",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q140048358": {
+    "label": "Sunstone Imperative",
+    "description": "novel by Scott Warren",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q140074915": {
+    "label": "Endings",
+    "description": "novelette by J. Kathleen Cheney",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q140353514": {
+    "label": "Miles to Go",
+    "description": "novel by David Weber",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q140353515": {
+    "label": "A Time to Kill",
+    "description": "novella by David Weber",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q140353516": {
+    "label": "The Traitor",
+    "description": "novelette by David Weber",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
   "Q141600939": {
     "label": "Rogue Bolo",
     "description": "1986 collection of linked military science fiction stories",
     "aliases": [],
     "datatype": null,
     "retrieved": "2026-09-29"
+  },
+  "Q141601211": {
+    "label": "Rogue Bolo",
+    "description": "1986 science fiction novella by Keith Laumer in the Bolo series",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q141601214": {
+    "label": "Final Mission",
+    "description": "1986 science fiction novella by Keith Laumer in the Bolo series",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q141609318": {
+    "label": "The Unconquerable",
+    "description": "science fiction anthology in the Bolo series",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141609319": {
+    "label": "The Triumphant",
+    "description": "science fiction anthology in the Bolo series",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141609320": {
+    "label": "Last Stand",
+    "description": "science fiction anthology in the Bolo series",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141609321": {
+    "label": "Old Guard",
+    "description": "science fiction anthology in the Bolo series",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141609322": {
+    "label": "Cold Steel",
+    "description": "science fiction work in the Bolo series",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141609458": {
+    "label": "Bolo Anthologies",
+    "description": "six-volume sequence of numbered Bolo books",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141609895": {
+    "label": "Lost Legion",
+    "description": "fictional story",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141609896": {
+    "label": "Camelot",
+    "description": "fictional story",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141609897": {
+    "label": "The Legacy of Leonidas",
+    "description": "fictional story",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141609898": {
+    "label": "Ploughshare",
+    "description": "fictional story",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141609899": {
+    "label": "Ghosts",
+    "description": "fictional story",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141609900": {
+    "label": "The Ghost of Resartus",
+    "description": "fictional story",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141609901": {
+    "label": "Operation Desert Fox",
+    "description": "fictional story",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141609902": {
+    "label": "As Our Strength Lessens",
+    "description": "fictional story",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141610024": {
+    "label": "Ancestral Voices",
+    "description": "fictional story",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141610025": {
+    "label": "Sir Kendrick's Lady",
+    "description": "fictional story",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141610026": {
+    "label": "You're It",
+    "description": "fictional story",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141610028": {
+    "label": "Shared Experience",
+    "description": "fictional story",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141610029": {
+    "label": "The Murphosensor Bomb",
+    "description": "fictional story",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141610030": {
+    "label": "Legacy",
+    "description": "fictional story",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141610031": {
+    "label": "Endings",
+    "description": "fictional story",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141610090": {
+    "label": "The Farmer's Wife",
+    "description": "fictional story",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141610091": {
+    "label": "Little Red Hen",
+    "description": "fictional story",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141610092": {
+    "label": "Little Dog Gone",
+    "description": "fictional story",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141610093": {
+    "label": "A Brief Technical History of the Bolo",
+    "description": "fictional work",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141610094": {
+    "label": "Robert R. Hollingsworth",
+    "description": "writer",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141610834": {
+    "label": "Honor of the Regiment (1993 paperback edition)",
+    "description": "1993 paperback edition of the Bolo science fiction anthology",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141610835": {
+    "label": "The Unconquerable (1994 paperback edition)",
+    "description": "paperback edition of The Unconquerable",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141610836": {
+    "label": "The Triumphant (1995 paperback edition)",
+    "description": "paperback edition of The Triumphant",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141610837": {
+    "label": "Last Stand (1997 paperback edition)",
+    "description": "paperback edition of Last Stand",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141610838": {
+    "label": "Old Guard (2001 paperback edition)",
+    "description": "paperback edition of Old Guard",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141610839": {
+    "label": "Cold Steel (2002 paperback edition)",
+    "description": "paperback edition of Cold Steel",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q141611525": {
+    "label": "Valuable Humans in Transit and Other Stories",
+    "description": "short story collection by qntm",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q141613159": {
+    "label": "Lena",
+    "description": "short story by qntm",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q141613160": {
+    "label": "If You Are Reading This",
+    "description": "short story by qntm",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q141613161": {
+    "label": "The Frame-by-Frame",
+    "description": "short story by qntm",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q141613162": {
+    "label": "The Difference",
+    "description": "short story by qntm",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q141613163": {
+    "label": "Gorge",
+    "description": "short story by qntm",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q141613164": {
+    "label": "cripes does anybody remember Google People",
+    "description": "short story by qntm",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q141613165": {
+    "label": "Driver",
+    "description": "short story by qntm",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q141613166": {
+    "label": "I Don't Know, Timmy, Being God Is a Big Responsibility",
+    "description": "short story by qntm",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q141613167": {
+    "label": "A Powerful Culture",
+    "description": "short story by qntm",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q141613168": {
+    "label": "Valuable Humans in Transit",
+    "description": "short story by qntm",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q1434818": {
+    "label": "Ghosts",
+    "description": "play by Henrik Ibsen from 1881",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q149537": {
+    "label": "novella",
+    "description": "written, fictional, prose narrative normally longer than a short story but shorter than a novel",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q150784": {
+    "label": "canyon",
+    "description": "geomorphological formation as narrow and deep ravine between cliffs or steep mountainsides",
+    "aliases": [
+      "gorge",
+      "chasm"
+    ],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q1553280": {
+    "label": "plowshare",
+    "description": "pointed front edge of a plow used for turning earth",
+    "aliases": [
+      "ploughshare",
+      "share"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q157340": {
+    "label": "Gorges",
+    "description": "commune in Somme, France",
+    "aliases": [
+      "Gorges, Somme"
+    ],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q15818790": {
+    "label": "Görge",
+    "description": "family name",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q15970445": {
+    "label": "Bill Fawcett",
+    "description": "American editor and anthologist, fiction writer, game designer, author, historian",
+    "aliases": [
+      "William Brian Fawcett",
+      "William B. Fawcett",
+      "William Fawcett"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-30"
   },
   "Q16248383": {
     "label": "Final Mission",
@@ -336,11 +1752,215 @@
     "datatype": null,
     "retrieved": "2026-09-29"
   },
+  "Q16610464": {
+    "label": "The Event",
+    "description": "album by Elvis Presley",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
   "Q16710404": {
     "label": "Codename 7700 – The Final Experiment",
     "description": "1994 film",
     "aliases": [
       "Final Mission"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q16746297": {
+    "label": "The Colonel",
+    "description": "episode of The Americans (S1 E13)",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q16869674": {
+    "label": "Driver",
+    "description": "family name",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q17402872": {
+    "label": "J. Andrew Keith",
+    "description": "American game designer (1958-1999)",
+    "aliases": [
+      "John Andrew Keith"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q17544234": {
+    "label": "Camelot",
+    "description": "vocal track by Py Bäckman; 1986 studio recording",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q1860": {
+    "label": "English",
+    "description": "West Germanic language",
+    "aliases": [
+      "English language",
+      "English (language)"
+    ],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q18612569": {
+    "label": "The Difference",
+    "description": "242nd strip of the webcomic xkcd",
+    "aliases": [
+      "xkcd 242"
+    ],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q1943534": {
+    "label": "Ghosts",
+    "description": "album by Rage",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q19871910": {
+    "label": "Paul Alexander",
+    "description": "American illustrator, science fiction illustrator, commercial artist",
+    "aliases": [
+      "Paul Richard Alexander",
+      "Paul Alexandra"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q19957102": {
+    "label": "Léna",
+    "description": "female given name",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q20188661": {
+    "label": "The Colonel",
+    "description": "painting by American 19th Century",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q20757256": {
+    "label": "The Difference",
+    "description": "1991 film",
+    "aliases": [
+      "Difference"
+    ],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q21183880": {
+    "label": "The Ploughshare",
+    "description": "1915 film by John H. Collins",
+    "aliases": [
+      "Ploughshare"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q216541": {
+    "label": "chauffeur",
+    "description": "person employed to drive a passenger motor vehicle",
+    "aliases": [
+      "driver",
+      "chauffeuse"
+    ],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q21783055": {
+    "label": "Shirley Meier",
+    "description": "Canadian writer",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q220437": {
+    "label": "Camelot",
+    "description": "mythical castle and court associated with King Arthur",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q22192553": {
+    "label": "The Event",
+    "description": "documentary about the August days of 1991 in Leningrad",
+    "aliases": [
+      "Event"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q22409104": {
+    "label": "Ploughshare Creek",
+    "description": "watercourse in Ontario, Canada",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q22409144": {
+    "label": "Ploughshare Rock",
+    "description": "submerged rock in New Brunswick, Canada",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q2293778": {
+    "label": "Driver",
+    "description": "1999 action driving video game",
+    "aliases": [
+      "Driver: You Are the Wheelman"
+    ],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q230944": {
+    "label": "Al-Waqi'a",
+    "description": "56th chapter of the Qur'an",
+    "aliases": [
+      "Surah 56",
+      "Sura 56",
+      "The Inevitable",
+      "The Event",
+      "Surah of the Event",
+      "Surah of the Inevitable",
+      "Surah of That Which is Coming",
+      "That Which is Coming"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q2309900": {
+    "label": "helmsman",
+    "description": "sailor with steering duties on a ship",
+    "aliases": [
+      "helms",
+      "helmsperson",
+      "driver"
+    ],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q23307127": {
+    "label": "Mind of My Mind",
+    "description": "book by Octavia E. Butler",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q2438479": {
+    "label": "Todd McCaffrey",
+    "description": "Irish American science fiction author",
+    "aliases": [
+      "Todd J. McCaffrey"
     ],
     "datatype": null,
     "retrieved": "2026-09-29"
@@ -355,6 +1975,278 @@
     "datatype": null,
     "retrieved": "2026-09-29"
   },
+  "Q24925": {
+    "label": "science fiction",
+    "description": "genre of speculative fiction that imagines advanced and futuristic changes in technology, scientific knowledge, or biological systems",
+    "aliases": [
+      "sci fi",
+      "sci-fi",
+      "science-fiction",
+      "sciencefiction",
+      "scifi",
+      "SF"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q24929932": {
+    "label": "Lena",
+    "description": "village in South Buru Regency, Maluku, Indonesia",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q25095471": {
+    "label": "Ghosts",
+    "description": "1997 studio album by Wendy Matthews",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q2592829": {
+    "label": "Ploughshares",
+    "description": "American literary journal",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q26000200": {
+    "label": "Lena",
+    "description": "village in Tolikara Regency, Highland Papua, Indonesia",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q277759": {
+    "label": "book series",
+    "description": "sequence of books having certain characteristics in common that are formally identified together as a group",
+    "aliases": [
+      "series of books",
+      "series of written works",
+      "series of texts"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q2881141": {
+    "label": "",
+    "description": "American book publisher",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q29575771": {
+    "label": "Lena",
+    "description": "family name",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q29587274": {
+    "label": "Lost Legion of Crassus",
+    "description": "",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q298234": {
+    "label": "Mercedes Lackey",
+    "description": "American novelist and short story writer",
+    "aliases": [
+      "Mercedes Ritchie Lackey"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q3017787": {
+    "label": "The Sky Is Falling",
+    "description": "novel by Sidney Sheldon",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q30612289": {
+    "label": "For We Are Many",
+    "description": "2017 Bobiverse novel by Dennis E. Taylor",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q3104966": {
+    "label": "Ghosts",
+    "description": "1915 film by John Emerson, George Nichols",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q3132619": {
+    "label": "Henry Bean",
+    "description": "American film director, actor",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q3181336": {
+    "label": "John DeCamp",
+    "description": "American politician (1941–2017)",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q3241335": {
+    "label": "Linda Evans",
+    "description": "American science fiction writer",
+    "aliases": [
+      "Linda Ellen Evans"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q3331189": {
+    "label": "version, edition or translation",
+    "description": "specific expression (Q111955324) or manifestation (Q111955382) of a work, consisting in its adaptation, edition, or translation (to be used with P31 [\"instance of\"])",
+    "aliases": [
+      "edition",
+      "version",
+      "expression",
+      "translation",
+      "issue",
+      "version, edition, or translation",
+      "(translated) version or edition",
+      "(translated) version or (translated) edition",
+      "version, edition, translated version or translated edition"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q352388": {
+    "label": "driver",
+    "description": "land vehicle operator",
+    "aliases": [
+      "vehicle driver",
+      "co-driver",
+      "co-vehicle driver",
+      "wheelman",
+      "wheelmen"
+    ],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q36180": {
+    "label": "writer",
+    "description": "person who uses written words to communicate ideas and to produce literary works",
+    "aliases": [
+      "writers",
+      "author",
+      "authors"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q3631401": {
+    "label": "The Colonel",
+    "description": "1917 film by Michael Curtiz",
+    "aliases": [
+      "Colonel"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q3699460": {
+    "label": "defile",
+    "description": "short narrow pass or gorge between mountains or hills",
+    "aliases": [
+      "gorge",
+      "narrow pass",
+      "mountain gorge"
+    ],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q37132093": {
+    "label": "Gorge",
+    "description": "family name",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q378622": {
+    "label": "racing driver",
+    "description": "occupation driving a vehicle in competition",
+    "aliases": [
+      "race driver",
+      "driver of racing vehicles",
+      "auto racer",
+      "car racer"
+    ],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q4441391": {
+    "label": "Christopher Stasheff",
+    "description": "American writer (1944-2018)",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q460919": {
+    "label": "Lena Hjelm-Wallén",
+    "description": "Swedish politician and government minister",
+    "aliases": [
+      "Lena Hjelm-Wallen"
+    ],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q46841": {
+    "label": "Lena River",
+    "description": "river in Eastern Siberia, Russia",
+    "aliases": [
+      "Lena"
+    ],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q471811": {
+    "label": "Steve Cropper",
+    "description": "American guitarist, songwriter, and record producer",
+    "aliases": [
+      "The Colonel",
+      "Steve “The Colonel” Cropper",
+      "Steven Lee Cropper"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q489437": {
+    "label": "Joseph Aved",
+    "description": "French painter (1702-1766)",
+    "aliases": [
+      "Jacques André Joseph Camellot Aved",
+      "Jacques Enré Joseph Aved",
+      "Jacques André Joseph Camelot Aved",
+      "Jacques Aved",
+      "Jacques André Joseph Aved",
+      "Jacques-Andre-Joseph-Camelot Aved",
+      "Jacques Andre Joseph Aved",
+      "Jacques-André-Joseph Aved",
+      "Jacques-Andre-Joseph Camelot Aved",
+      "Camelot Aved",
+      "Jacques-André-Joseph Camelot Aved",
+      "Aved le Batave",
+      "Jacques Andre Joseph Camelot Aved",
+      "J.A.J. Aved",
+      "Jacques Andre Joseph Camellot Aved",
+      "Jacques Enre Joseph Aved",
+      "Jacques-Andre-Joseph Aved",
+      "Aved",
+      "Jacques-André Joseph Aved",
+      "André-Joseph Aved",
+      "Jacques Aved-Camelot"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
   "Q48997316": {
     "label": "Bolo: Annals of the Dinochrome Brigade",
     "description": "1976 science fiction story collection by Keith Laumer",
@@ -363,6 +2255,69 @@
     ],
     "datatype": null,
     "retrieved": "2026-09-29"
+  },
+  "Q49757": {
+    "label": "poet",
+    "description": "person who writes poetry",
+    "aliases": [
+      "poetess",
+      "bard",
+      "poetry writer",
+      "poetry author"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q5": {
+    "label": "human",
+    "description": "any single member of Homo sapiens, unique extant species of the genus Homo",
+    "aliases": [
+      "human being",
+      "people",
+      "nonfictional human",
+      "non-fictional human",
+      "individual Homo sapiens",
+      "modern human"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q5025934": {
+    "label": "Camelot",
+    "description": "1989 video game",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q508846": {
+    "label": "truck driver",
+    "description": "person who earns a living as the driver of a truck",
+    "aliases": [
+      "truckie",
+      "lorry driver",
+      "trucker",
+      "driver",
+      "truck drivers"
+    ],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q5231938": {
+    "label": "David Burroughs Mattingly",
+    "description": "American artist",
+    "aliases": [
+      "David Mattingly",
+      "David B. Mattingly"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q5331267": {
+    "label": "Eater",
+    "description": "2000 novel by Gregory Benford",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
   },
   "Q5449415": {
     "label": "Final Mission",
@@ -373,9 +2328,163 @@
     "datatype": null,
     "retrieved": "2026-09-29"
   },
+  "Q54807265": {
+    "label": "Legacy",
+    "description": "1991 novel by Michael Jan Friedman",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q55476641": {
+    "label": "Karen Wehrstein",
+    "description": "Canadian author (1961- )",
+    "aliases": [
+      "Karen Miriam Wehrstein"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q56087567": {
+    "label": "The Colonel",
+    "description": "episode of Highlander: The Series (S4 E7)",
+    "aliases": [
+      "Colonel"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q56890787": {
+    "label": "SHARED EXPERIENCE",
+    "description": "",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q588653": {
+    "label": "David Weber",
+    "description": "American science fiction and fantasy writer (born 1952)",
+    "aliases": [
+      "David Martin Weber",
+      "David Mark Weber"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q6012162": {
+    "label": "In the Flesh",
+    "description": "TV series",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q6107139": {
+    "label": "J. Steven York",
+    "description": "American writer",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
   "Q61456381": {
     "label": "Attrition",
     "description": "2018 film directed by Mathieu Weschler",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q6189807": {
+    "label": "Jewish Currents",
+    "description": "Progressive Jewish magazine",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q6490202": {
+    "label": "Larry Dixon",
+    "description": "American writer",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q65261214": {
+    "label": "Siim Sinamäe",
+    "description": "Estonian poet (born 1992)",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q654581": {
+    "label": "Lena",
+    "description": "female given name",
+    "aliases": [
+      "Lena (first name)",
+      "Lena (given name)"
+    ],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q66319796": {
+    "label": "OPERATION DESERT FOX - ADR - DAY 1-3 (NAID 140106426)",
+    "description": "item in the National Archives and Records Administration's holdings",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q6684135": {
+    "label": "Lost Legacy",
+    "description": "short story by Robert A. Heinlein",
+    "aliases": [
+      "Lost Legion"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q6751038": {
+    "label": "Manny Pacquiao vs. Joshua Clottey",
+    "description": "Boxing match",
+    "aliases": [
+      "The Event"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q684780": {
+    "label": "Camelot Software Planning",
+    "description": "Japanese video game developer",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q6966205": {
+    "label": "narrative designer",
+    "description": "professional in the gaming industry who focuses on developing and integrating narrative elements within a video game",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q7013": {
+    "label": "Lena Meyer-Landrut",
+    "description": "German singer (born 1991)",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q71693825": {
+    "label": "",
+    "description": "2019 role-playing video game",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q7205152": {
+    "label": "Ploughshares Advisory Editors",
+    "description": "",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q7205153": {
+    "label": "Ploughshares Fund",
+    "description": "non-profit organization in the USA",
     "aliases": [],
     "datatype": null,
     "retrieved": "2026-09-29"
@@ -389,6 +2498,92 @@
     "datatype": null,
     "retrieved": "2026-09-29"
   },
+  "Q729741": {
+    "label": "Gorges",
+    "description": "commune in Manche, France",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q731199": {
+    "label": "",
+    "description": "asteroid",
+    "aliases": [
+      "Camelot",
+      "1281 T-2"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q7344933": {
+    "label": "Robert Greenberger",
+    "description": "American writer",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q736343": {
+    "label": "David Drake",
+    "description": "American author of science fiction and fantasy literature (1945–2023)",
+    "aliases": [
+      "Dave Drake",
+      "David Allen Drake"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q74040863": {
+    "label": "And Don't Come Back",
+    "description": "print in the National Gallery of Art (NGA 61780)",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q7489533": {
+    "label": "Shared Experience",
+    "description": "British theatre company",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q7489641": {
+    "label": "Shariann Lewitt",
+    "description": "American writer",
+    "aliases": [
+      "S. N. Lewitt",
+      "Gordon Kendall",
+      "S.N. Lewitt"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q749819": {
+    "label": "Gorges",
+    "description": "commune in Loire-Atlantique, France",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q7600780": {
+    "label": "Star Light",
+    "description": "1970 novel by Hal Clement",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q769942": {
+    "label": "Angonoka tortoise",
+    "description": "species of reptile",
+    "aliases": [
+      "Astrochelys yniphora",
+      "ploughshare tortoise",
+      "Madagascan (plowshare) tortoise",
+      "Madagascan tortoise",
+      "plowshare tortoise"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
   "Q7725634": {
     "label": "literary work",
     "description": "written work read for enjoyment or edification",
@@ -396,6 +2591,148 @@
       "work in literature",
       "literary text"
     ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q7726806": {
+    "label": "The Colonel",
+    "description": "British-bred Thoroughbred racehorse",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q7730149": {
+    "label": "The Difference",
+    "description": "1997 single by The Wallflowers",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q7730150": {
+    "label": "The Difference",
+    "description": "2008 debut studio album by Pendleton",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q7732659": {
+    "label": "The Event",
+    "description": "2003 film by Thom Fitzgerald",
+    "aliases": [
+      "Event"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q78466715": {
+    "label": "The Difference",
+    "description": "1999 animated short film by Rita Küng",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q799732": {
+    "label": "Baen Books",
+    "description": "publisher",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q8010470": {
+    "label": "William H. Keith, Jr.",
+    "description": "American writer",
+    "aliases": [
+      "Ian Douglas",
+      "Robert Cain",
+      "H. Jay Riker"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q81640740": {
+    "label": "The Difference",
+    "description": "vocal track by The Wallflowers; 1996 studio recording",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q81644802": {
+    "label": "The Difference",
+    "description": "musical project by Dutch techno producer André van den Bosch",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q8253": {
+    "label": "fiction",
+    "description": "genre and narrative form, in any medium, consisting of people, events, or places that are imaginary—in other words, not based strictly on history or fact",
+    "aliases": [
+      "fictional",
+      "fiction form",
+      "fictional art form",
+      "imaginary genre",
+      "imaginary art genre"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q8261": {
+    "label": "novel",
+    "description": "narrative text, normally of a substantial length and in the form of prose describing a fictional and sequential story",
+    "aliases": [
+      "novels"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q83863160": {
+    "label": "Driver: You Are the Wheelman",
+    "description": "2000 video game for Game Boy Color",
+    "aliases": [
+      "Driver"
+    ],
+    "datatype": null,
+    "retrieved": "2026-10-01"
+  },
+  "Q838661": {
+    "label": "",
+    "description": "American writer",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q87675672": {
+    "label": "Anastassia N. Alexandrova",
+    "description": "Russian-American chemist",
+    "aliases": [
+      "Anastassia Alexandrova",
+      "Anastassia N Alexandrova",
+      "A N Alexandrova",
+      "AN Alexandrova",
+      "A. N. Alexandrova",
+      "A.N. Alexandrova"
+    ],
+    "datatype": null,
+    "retrieved": "2026-09-30"
+  },
+  "Q904447": {
+    "label": "military science fiction",
+    "description": "science fiction subgenre",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q913403": {
+    "label": "Mike Resnick",
+    "description": "American writer (1942-2020)",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-09-29"
+  },
+  "Q930372": {
+    "label": "Camelot",
+    "description": "1967 musical film by Joshua Logan",
+    "aliases": [],
     "datatype": null,
     "retrieved": "2026-09-29"
   }
