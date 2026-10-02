@@ -8,6 +8,14 @@ Instructions for AI coding assistants working in this repository.
 
 Model creative works separately from editions. Prefer P1433 (`published in`) for story-to-collection relations when evidence supports it. Keep a work's first publication date distinct from a later anthology appearance date. The sample Bolo record and AbeBooks source are illustrative and unverified.
 
+Keep basic entry proposals lean. One suitable inspected source can support
+multiple core facts; do not require exhaustive sourcing or multiple independent
+sources for routine bibliographic claims. Author sites, interviews, podcasts,
+credits, and relevant retailer or community catalogs can support the facts they
+explicitly document. Judge support per claim, preserve excerpts and locators,
+and omit unsupported optional details. A weak claim calls for targeted review,
+not a new audit of every source in the case.
+
 ## Archetype and tooling
 
 Python package using uv, just, Ruff, strict mypy, pytest, and GitHub Actions.
@@ -43,15 +51,27 @@ source research, identity decisions, and book or author field checklists.
 
 From the repository root, inspect only the affected entities and their linked
 sources. Read `docs/modeling.md` and check the local metadata cache before
-external research. Verify support for every new claim, keep the requested
-scope, then regenerate affected outputs once:
+external research. Collect source evidence and draft claims before live
+Wikidata matching. Source-collection requests can finish with unresolved
+identities; do not run matching or snapshots just to gather sources. For edit
+proposals, check unresolved identities in one focused pass, batch candidate
+inspection, and reuse saved results. Follow up only on specific identity gaps.
+For multiple independent books or authors, use available Luna agents to collect
+sources in parallel. Give each agent a separate research output file; merge
+findings into the case centrally and perform Wikidata checks once for the case.
+Verify support for every new claim, keep the requested scope, then regenerate
+affected outputs once:
 
 ```sh
 just pilot prepare requests/REQUEST/case.json --output requests/REQUEST/batches/001-create.qs
 ```
 
-Preparation is offline by default. Add `--snapshot` when current item
-statements matter or before submission; an offline plan is not a live check.
+Preparation is offline by default. Add `--snapshot` once at final review before
+submitting additions to existing items, or when a specific decision needs
+current statements. Repeat only when affected items or live statements change;
+source-only revisions do not require another snapshot. Creation-only batches
+need identity checks, not snapshots of unrelated existing items. An offline
+plan is not a live check.
 Review the plan, proposal JSON, and QS batch before manual submission.
 
 ## Wikidata access
@@ -75,8 +95,8 @@ short-lived candidate cache. See the API settings in `docs/commands.md`.
    ```
 2. Use browsing tools to inspect source pages. Record actual retrieval dates, supporting excerpts, locators, and claim-to-source links. Mark a source verified only after checking the material and each linked claim. Model memory and search snippets are insufficient evidence.
 3. Search unresolved entities with `match`. Inspect candidate items, alternate titles, authors, and external identifiers before recording an identity decision. Keep uncertain matches unresolved and explain conflicts in the case.
-4. Use `cache --find` for local QID/PID metadata lookup and `cache --case CASE` to fetch missing metadata. Keep `data/wikidata_ids.json` checked in. Names can match multiple IDs; metadata is not evidence or an identity decision. Use `--refresh` explicitly when metadata needs updating. Generate a plan with live snapshots. Review all additions, date precision, qualifiers, work/edition scope, and source support before exporting.
-5. Export the reviewed case. The user submits the batch in QuickStatements. Record returned QIDs and retain the execution report before generating a subsequent batch.
+4. Use `cache --find` for local QID/PID metadata lookup and fetch missing metadata once with `cache --case CASE` after the claim set is stable. Keep `data/wikidata_ids.json` checked in. Names can match multiple IDs; metadata is not evidence or an identity decision. Use `--refresh` explicitly when metadata needs updating. Draft offline; capture a live snapshot at final review when adding claims to existing items. Review all additions, date precision, qualifiers, work/edition scope, and source support before exporting.
+5. Export the reviewed case. The user submits the batch in QuickStatements. Save the creation result lines, preview the mapping with `just pilot record-qids CASE REPORT --batch BATCH.qs`, and apply it with `--apply` only after reviewing the preview. Retain the execution report before generating a subsequent batch.
 
 Use `just pilot` for every CLI invocation. The top-level case object contains
 `schema_version`, `title`, `sources`, and `entities`; see the README table for

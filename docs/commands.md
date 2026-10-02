@@ -12,6 +12,14 @@ HTML or `Special:WhatLinksHere`. Research commands print compact JSON without
 saving request artifacts or updating tracked metadata. Store saved results under
 `requests/<request-name>/`.
 
+Collect external evidence and draft claims offline before matching identities.
+For proposals, run `match` once with the collected identifiers and title hints,
+inspect plausible candidates together, and reuse saved outputs. Use additional
+queries only to resolve a specific identity gap or answer a requested Wikidata
+question. Fetch missing metadata once after the claim set is stable. Source
+collection alone needs no live Wikidata calls. Prepare drafts offline and use
+`--snapshot` at final review before submitting additions to existing items.
+
 ### API access
 
 Set `WIKIDATA_PILOT_CONTACT` to a real operator email address or project URL
@@ -369,8 +377,12 @@ metadata used for labels; planning does not update it.
 
 `prepare CASE --output PATH.qs` validates and writes the review plan, proposal
 JSON, and staged QS batch. It is offline unless `--snapshot` is supplied.
-Review all outputs before manual submission. Preserve submitted files and use
-a new numbered batch path for later exports.
+Use `--snapshot` once at final review when adding claims to existing items, or
+earlier when a decision depends on current statements. Source-only revisions
+do not require another snapshot; changed affected items or live statements do.
+Creation-only batches still need identity checks, but no snapshot of unrelated
+existing items. Review all outputs before manual submission. Preserve submitted
+files and use a new numbered batch path for later exports.
 
 ## export
 

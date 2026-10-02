@@ -26,27 +26,37 @@ session opened in this repo:
 $wikidata-research Check whether the Rogue Bolo story is a novella.
 ```
 
+For multiple independent books or authors, the skill uses available Luna agents
+to research sources in parallel, such as one agent per book. Agents save
+separate findings; the coordinating agent reviews and merges their evidence,
+then performs the shared Wikidata identity checks.
+
 The skill lives under `.agents/skills/`, the
 [repo-local discovery path](https://learn.chatgpt.com/docs/build-skills#where-codex-loads-local-skills).
 
+Basic entry proposals need enough inspected evidence to identify the subject
+and support core statements. One suitable source can support several facts.
+Author sites, interviews, podcasts, credits, and relevant catalogs are usable
+for facts they explicitly document. Optional details can be omitted; exhaustive
+biography and repeated independent corroboration are not required.
+
 ```sh
 just pilot init requests/bolo/case.json
-just pilot inspect Q48997316 > requests/bolo/collection.json
-just pilot plan requests/bolo/case.json --snapshot
+just pilot plan requests/bolo/case.json
 ```
 
 `init` creates an illustrative Bolo case. Its AbeBooks excerpt is explicitly unverified; replace or verify it before marking that source `verified`. The supplied QIDs are candidates to confirm, not assertions that the listed entities or relationships have been independently verified.
 
-An agent reads Wikidata through the API commands below, uses browsing tools for external book sources, records source passages in `requests/bolo/case.json`, and adds each story as an entity. Set entities needing candidate searches to `unresolved`. The supplied example entities already have QIDs, so `match` skips them. Then run:
+An agent first uses browsing tools for external book sources, records source passages in `requests/bolo/case.json`, and drafts the requested claims. Source collection can finish with unresolved identities; it does not require live Wikidata calls. For a creation or edit proposal, put supported identifiers and author hints in the case, then check identities through the API commands below. Set entities needing candidate searches to `unresolved`. The supplied example entities already have QIDs, so `match` skips them. Then run:
 
 ```sh
 just pilot match requests/bolo/case.json
-# Inspect candidates, record resolution decisions, and verify sources in requests/bolo/case.json.
+# Batch-inspect plausible candidates, then record resolution decisions in the case.
 just pilot validate requests/bolo/case.json
 just pilot prepare requests/bolo/case.json --output requests/bolo/batches/001-create.qs
 ```
 
-`validate` and `prepare` fail on the original template until its source is verified. `prepare` writes `requests/bolo/case.plan.md`, `requests/bolo/case.plan.json`, and `requests/bolo/batches/001-create.qs` from the same case. It plans offline by default; add `--snapshot` when current item statements matter or before submission. Review all three files, paste `001-create.qs` into QuickStatements 3 using V1 syntax, preview the commands, and run the batch manually. Store the downloaded execution report beside its batch. Do not rerun a creation batch after a timeout without checking whether items were created.
+`validate` and `prepare` fail on the original template until its source is verified. `prepare` writes `requests/bolo/case.plan.md`, `requests/bolo/case.plan.json`, and `requests/bolo/batches/001-create.qs` from the same case. It plans offline by default. Add `--snapshot` once at final review before submitting additions to existing items, or earlier for a decision that needs current statements. Source-only revisions do not require another snapshot. Creation-only batches need identity checks, but no snapshot of unrelated existing items. Review all three files, paste `001-create.qs` into QuickStatements 3 using V1 syntax, preview the commands, and run the batch manually. Store the downloaded execution report beside its batch. Do not rerun a creation batch after a timeout without checking whether items were created.
 
 The top-level case object contains `schema_version`, `title`, `sources`, and `entities`. It is UTF-8 JSON validated with Pydantic. Each entity has a local key and a resolution of `unresolved`, `existing` with a QID, or `create`. A `create` decision must include a reason. A no-result search is never proof that an item does not exist; inspect candidates and record the search context in the resolution reason before choosing `create`. Matching checks exact external identifier values before title candidates and title-plus-author candidates. Ambiguous results remain unresolved until a person records a decision.
 
@@ -124,10 +134,10 @@ just pilot cache P50 Q724395
 just pilot cache --case requests/bolo/case.json
 # Explicitly refresh the requested IDs.
 just pilot cache --case requests/bolo/case.json --refresh
-just pilot plan requests/bolo/case.json --snapshot
+just pilot plan requests/bolo/case.json
 ```
 
-Plans load cached labels automatically and retain the IDs, for example `author (P50)` and `Keith Laumer (Q724395)`. Missing metadata falls back to the ID. Planning does not update the cache; run `cache --case` after adding IDs to a case. Current claim snapshots are always fetched separately with `--snapshot`.
+Plans load cached labels automatically and retain the IDs, for example `author (P50)` and `Keith Laumer (Q724395)`. Missing metadata falls back to the ID. Planning does not update the cache; run `cache --case` once after the claim set is stable. Current claim snapshots are fetched separately with `--snapshot` when needed for review.
 
 Name lookup returns all exact, case-insensitive label and alias matches. A cached name is a search aid, not an identity decision or evidence for a claim. Cache updates stop on missing or redirected IDs and leave the file unchanged on failure. Inspect redirected IDs before updating the case. Review and commit JSON diffs to share metadata between agent sessions.
 

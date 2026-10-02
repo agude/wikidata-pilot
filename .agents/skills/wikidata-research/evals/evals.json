@@ -37,6 +37,36 @@
       "expected_output": "Use local metadata first, linked with the confirmed author QID and P50, linked with the collection QID and P1433, inspect P123 with P2302, and page to select guidance sections. Follow continuation markers instead of treating the first page as exhaustive. Do not browse Wikidata HTML or Special:WhatLinksHere. Inspect candidate identities and use external primary evidence for claims."
     },
     {
+      "id": 8,
+      "prompt": "Collect sources for these five books and six authors so we can create entries later. I want the research quickly; do not prepare a submission yet.",
+      "expected_output": "Use available Luna agents for independent subjects in parallel, with separate research output files and central case updates. Collect inspected external evidence for core requested facts and save excerpts, retrieval dates, locators, and claim links in the request case. Reuse local modeling and metadata. Keep unconfirmed identities unresolved. Return the source dossier and gaps without running match, live identity inspection, authority-ID sweeps, or snapshots. Do not export an unresolved case."
+    },
+    {
+      "id": 9,
+      "prompt": "We have collected the sources and identifiers for eleven subjects. Prepare creation proposals. Some candidates are already saved and one author is a namesake.",
+      "expected_output": "Reuse saved candidates and confirmed decisions. Run one matching pass for unresolved subjects using the collected facts, batch-inspect plausible identities, and make targeted follow-ups for the namesake or a missed expected work. Keep ambiguous identities unresolved and do not treat empty searches as proof of absence. Do not search every authority database or unrelated author bibliography. A creation-only batch needs identity checks but no live snapshot of unrelated existing items."
+    },
+    {
+      "id": 10,
+      "prompt": "The identities are confirmed and the case has a final live snapshot for additions to existing items. Replace a weak source with a publisher page supporting the same claims, then regenerate the draft.",
+      "expected_output": "Verify the replacement source and linked claims, update evidence, and prepare the draft offline. Reuse identity decisions and saved inspection outputs. Do not rerun matching or fetch another live snapshot for a source-only correction. Refresh live statements only if affected items change or there is reason to expect statements changed before submission."
+    },
+    {
+      "id": 11,
+      "prompt": "Research these two books for new Wikidata entries. Use multiple Luna agents so the source collection happens in parallel.",
+      "expected_output": "Assign one book to each available Luna agent with requested scope, local modeling guidance, and separate output files under the request research directory. Require inspected source material, URLs, retrieval dates, excerpts, locators, proposed claims, and gaps. Merge findings centrally after checking support and work/edition scope. Perform one shared identity pass after collecting sources; agents must not independently repeat matching, metadata fetches, or snapshots. Agent summaries and snippets are not verified evidence."
+    },
+    {
+      "id": 12,
+      "prompt": "Create a lean author proposal. Their website and a podcast interview clearly connect the pen name to the book, but there is no newspaper profile, library authority ID, or birth date.",
+      "expected_output": "Accept the inspected website and checked podcast notes, transcript, or timestamped audio for the core identity and authorship facts they explicitly support. Preserve excerpts and locators, check Wikidata identity before creation, and omit unsupported biography. Do not require newspaper coverage, an authority ID, multiple independent sources, or a full biography before preparing the lean proposal."
+    },
+    {
+      "id": 13,
+      "prompt": "The inspected retailer page gives the edition title, byline, and ISBN. Its description makes an implausible promotional claim. We only need the core bibliographic entry.",
+      "expected_output": "Evaluate support per claim. Use the clear edition title, byline, and ISBN where identity and edition scope are established; omit the implausible promotional claim. Do not treat the retailer category as automatically unusable, require scans or academic sources for the core facts, or restart a whole-case audit. Do not turn the edition listing date into a work's first-publication date."
+    },
+    {
       "id": 14,
       "prompt": "Prepare Google Knowledge Graph P2671 and Freebase P646 identifiers confirmed from saved Google panels. Do we need QS references, and can we skip identity review?",
       "expected_output": "Omit QuickStatements reference snaks for P2671 and P646 external-ID claims because the identifiers link to the entity. Confirm the correct person or work and work/edition scope. Retain inspected captures, URLs, retrieval dates, excerpts, and claim-to-source links in the local case; do not skip evidence validation. Other properties keep their references."

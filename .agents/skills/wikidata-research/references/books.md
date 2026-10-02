@@ -6,16 +6,22 @@ record does not establish every fact about the work.
 
 ## Find evidence
 
-Start with a confirmed author or editor QID and search linked works. Compare
-alternate titles and identifiers. Check title and copyright pages, contents,
-and bylines. Publisher catalogs help identify contents and type of writing;
+Start with accessible publisher or author pages, bibliographic records, or
+retailer listings that directly document the requested facts. Check title and
+copyright pages, contents, and bylines when needed; obtaining scans is not a
+prerequisite when suitable web evidence already supports the core claims.
+One suitable source can support several facts. Collect alternate
+titles and identifiers for the later identity check. Search a confirmed author
+or editor's linked works when title or identifier searches leave a specific
+work unresolved. Publisher catalogs help identify contents and type of writing;
 library records identify editions; specialist bibliographies can establish
 earlier appearances. Confirm which version each source describes. A contents
 list establishes inclusion; it does not necessarily establish first
 publication, authorship, or type of writing.
 
-For large reviews of scans across several volumes, use available Luna agents
-to read separate books in parallel. Use text recognition (OCR) to find pages,
+For two or more books, use multiple available Luna agents to collect sources
+in parallel, one book per agent, following the skill's parallel research
+workflow. For scans, use text recognition (OCR) to find pages,
 then verify names, titles, credits, identifiers, and numbering in the images.
 When the print is ambiguous, treat OCR and other agents' transcriptions as
 leads. A prologue or other front matter may precede the first story; check its
@@ -69,7 +75,8 @@ needs review; the tool cannot delete or move statements automatically.
 | Edition | ISBN | P212 / P957 | ISBN-13 / ISBN-10 for that edition, in the property's required format |
 | Relevant item | Editor / translator | P98 / P655 | Explicit role and work or edition scope |
 
-When an edition links to a work with P629, inspect the work for P747. Add a
+When proposing an edition link to a work with P629, check the work for P747
+during the final live review of existing-item additions. Add a
 missing P747 only when current property rules call for it and the source
 identifies that edition. Check live statements first.
 

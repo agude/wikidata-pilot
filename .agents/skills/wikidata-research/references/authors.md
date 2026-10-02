@@ -6,19 +6,26 @@ fields are missing.
 
 ## Identify the person
 
-Start with a supplied or confirmed Wikidata item ID (QID). For people with the
-same name, compare credited works, dates, pen names, and library records.
+Collect the source byline and identity evidence first. Reuse a supplied or
+previously confirmed Wikidata item ID (QID) as a matching lead. For people with
+the same name, compare credited works, dates, pen names, and library records.
 A matching name or occupation is insufficient. Make sure each record describes
 this person, not a namesake, organization, or several people together. Use the
-confirmed QID to search the author's works.
+confirmed QID to search linked works when a requested work remains unresolved.
 
-Prefer publisher or author biographies, library records, and reliable
-biographical sources. Record evidence for each fact. Preserve conflicting
+Publisher or author biographies, interviews, podcasts, credits, and library
+records can support the name, authorship, or occupation they explicitly document.
+A suitable source for these core facts is enough for a lean author proposal;
+do not require a full biography or an authority record. Use checked podcast
+notes, a transcript, or audio with a timestamp. Record evidence for each
+proposed fact. Preserve conflicting
 dates; do not average them or silently choose the more precise one. Omit
 missing dates.
 
-When creating a person item, check relevant authority IDs even if the request
-is about a work. For specialist databases such as ISFDB, follow the author's
+When creating a person item, use authority IDs found in the consulted sources
+to help check identity. Search another authority database when a specific
+identity conflict remains or the user requests those IDs. For specialist
+databases such as ISFDB, follow the author's
 profile from a known work when possible and compare its bibliography with the
 source byline. Treat name-search results as leads. Add an ID only when the
 records identify the same person; cite the profile or ID record and the
