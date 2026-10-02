@@ -19,6 +19,12 @@ before a request needs the network. The value is included in the versioned
 User-Agent. A cache hit and offline commands do not require contact settings.
 No contact value is built into the package.
 
+`just pilot` and `bin/pilot` load a repository-root `.env` file when present.
+Use it for `WIKIDATA_PILOT_CONTACT` and `GOOGLE_KG_API_KEY`. The file is ignored
+by Git; existing shell environment values take precedence. uv parses the file
+as environment assignments, without executing shell commands. `google-kg`
+uses `GOOGLE_KG_API_KEY` for its default API backend.
+
 `just pilot` stores shared endpoint locks, cooldown timestamps, and candidate
 results in the ignored `.wikidata-pilot-state/` directory. Set
 `WIKIDATA_PILOT_STATE_DIR` to use another writable directory. Direct calls to
@@ -214,6 +220,109 @@ modeling decisions. Guidance defines conventions, not facts about a subject.
 
 Keep cases and generated outputs in ignored request directories. See the
 [case format](../README.md#case-format) and [review workflow](../README.md#quick-start).
+
+## google-kg
+
+`google-kg` searches Google's Knowledge Graph API for identifier candidates and
+writes a Markdown review report, JSON report, and saved responses with source
+metadata. It does not accept matches, change a case, or export statements.
+Every candidate requires identity review: results can include namesakes,
+related people, other books, editions, and carousels.
+
+Set `GOOGLE_KG_API_KEY` in the repository-root `.env` or shell. The default
+`--backend api` needs no browser. Requests send the key only in the
+`X-Goog-Api-Key` header; response echoes of the key are redacted before saving.
+Errors never print request headers or transport exception details.
+
+Use `--backend browser` for Google Search scraping. Install its browser once
+after `just sync`:
+
+```sh
+PLAYWRIGHT_BROWSERS_PATH="$PWD/.wikidata-pilot-state/browsers" \
+  UV_CACHE_DIR="$PWD/.uv-cache" uv run playwright install chromium
+```
+
+For example, with the Falcorian operator identity:
+
+```sh
+export WIKIDATA_PILOT_CONTACT=https://www.wikidata.org/wiki/User:Falcorian
+just pilot google-kg --qids-file /tmp/missing-google-kg-qids.txt \
+  --max-items 3 --output requests/google-kg-trial/google-kg
+just pilot google-kg requests/REQUEST/case.json
+```
+
+Supply exactly one case, `--qids QID...`, or `--qids-file PATH` (whitespace
+separated QIDs). Case input selects resolved existing entities and retains
+author search hints. `--output DIRECTORY` is required for QID inputs; a case
+defaults to `google-kg/` beside the case. `--max-items` defaults to 10 and limits
+selected unique QIDs before network access. Wikidata context is fetched in
+batches, with author labels fetched once for search hints.
+
+Items with an existing non-deprecated P2671 value are marked `already_present`.
+Other P2671 statements, including deprecated values and unknown/no-value
+statements, are marked `identifier_review`. Neither status triggers a Google
+search. P646 is preserved for comparison and does not exclude an item from
+searching for a missing P2671. `/g/` candidates map to P2671 and `/m/` candidates
+map to P646. An existing `/m/` value is already a Google-compatible identifier;
+Google need not also expose a `/g/` ID for that entity.
+
+The API backend makes one English query per selected item that needs a lookup,
+with `--limit` candidates (default 5, range 1–20). People explicitly classified
+with P31 Q5 use Google's `Person` filter; other items have no type filter.
+Requests use a 20-second timeout and the same minimum 10-second pause between
+lookups. HTTP errors, API errors, malformed responses, and network failures
+stop further live requests, without automatic retries. Empty candidate lists
+are `no_candidates` and remain inconclusive.
+
+API candidates retain name, description, types, website, detailed description,
+result score, and JSON locators with excerpts. Scores describe search relevance
+and never establish identity. Raw responses use `.response.json` files under
+`raw/`; adjacent metadata records the request URL without credentials, query,
+backend, and retrieval timestamp. API and browser caches are separate. Changing
+the candidate limit or type filter also requires a separate API request.
+
+The browser backend opens a separate Chromium browser, uses English search
+pages, and waits two seconds for each page to render. `--headed` shows its window. It sends
+one search per selected item with a label, adding the first known author when
+available. `--delay SECONDS` sets the pause between searches and must be at least
+10 seconds. HTTP errors, consent pages, CAPTCHA pages, and JavaScript
+interstitials stop further live searches. They are reported as `blocked`, never
+as evidence that an entity lacks an ID. Browser failures are `failed`;
+unattempted items remain `not_attempted`. Any of these statuses gives exit code
+2; candidate and empty-result reports give exit code 0. A live browser or file
+failure also stops further live requests; saved-page failures leave other page
+pairs available for processing.
+
+Rendered HTML is parsed for `data-kpid`, `data-entityid`, Google search links
+with `kgmid`, and `g.co/kg/` entity links. Candidate JSON retains each
+occurrence's attribute, excerpt, and HTML line/column locator. Review the
+saved HTML and open candidate links to distinguish the searched entity from
+related entities. Ordinary pages without extracted IDs are `no_candidates`,
+which remains inconclusive. Search queries, current Wikidata statements,
+source URLs, capture times, and existing-ID comparisons remain in the report.
+
+Non-blocked responses are reused for the same QID and request for 24 hours.
+`--fresh` fetches again. Draft reports may be regenerated; every capture gets a
+new filename under `raw/`, preserving earlier evidence. Source pages may
+contain unrelated search content; request artifacts remain untracked.
+
+To parse pages saved from a regular browser, use `--saved-pages DIRECTORY`,
+which selects the browser backend unless `--backend` is supplied explicitly.
+For each selected item that needs a search, supply `QID.html` and `QID.json`.
+The JSON must record the actual source URL and retrieval date or timestamp:
+
+```json
+{"url": "https://www.google.com/search?q=Example&hl=en", "retrieved": "2026-10-01"}
+```
+
+Saved-page mode makes no Google requests, but still checks current Wikidata
+context. Missing or invalid page pairs are reported as failures. Resolve
+browser consent or access issues manually before saving pages; rerunning the
+command does not bypass those restrictions.
+
+After identity review, add accepted IDs and their supporting evidence to the
+structured case. Use `prepare --snapshot` for the final review and submit the
+generated batch manually.
 
 ## init
 

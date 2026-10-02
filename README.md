@@ -73,6 +73,11 @@ Regenerate draft plans as needed. Keep shared metadata in
 
 ## Case format
 
+For Google Knowledge Graph ID discovery, use
+[`google-kg`](docs/commands.md#google-kg). It uses the API key from `.env` by
+default, supports browser scraping and saved-page imports, and saves evidence
+and candidate review reports under the request directory.
+
 | Record | Required fields | Optional fields |
 |---|---|---|
 | Case | `schema_version: 1`, `title`, `sources`, `entities` | — |

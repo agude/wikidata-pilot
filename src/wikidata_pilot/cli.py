@@ -12,6 +12,7 @@ import httpx
 from pydantic import ValidationError
 
 from .cache import DEFAULT_CACHE, IdCache, case_ids
+from .google_kg import ScrapeOptions, scrape_google_kg, select_qids
 from .inspection import summarize_entity
 from .models import load_case, save_case
 from .wikidata import WikidataClient
@@ -104,6 +105,21 @@ def parser() -> argparse.ArgumentParser:
 
     initialize = command("init", help="create an illustrative case template")
     initialize.add_argument("path", type=Path)
+    google_kg = command("google-kg", help="find Google identifier candidates for review")
+    google_kg.add_argument("case", type=Path, nargs="?")
+    google_inputs = google_kg.add_mutually_exclusive_group()
+    google_inputs.add_argument("--qids", nargs="+")
+    google_inputs.add_argument("--qids-file", type=Path)
+    google_kg.add_argument("--output", type=Path)
+    google_kg.add_argument("--max-items", type=int, default=10)
+    google_kg.add_argument("--delay", type=float, default=10)
+    google_kg.add_argument("--headed", action="store_true", help="show the separate browser")
+    google_kg.add_argument("--fresh", action="store_true", help="ignore saved search pages")
+    google_kg.add_argument("--saved-pages", type=Path, help="import QID.html and QID.json pairs")
+    google_kg.add_argument(
+        "--backend", choices=["api", "browser"], help="defaults to api, or browser for saved pages"
+    )
+    google_kg.add_argument("--limit", type=int, default=5, help="API candidates per item (1-20)")
     inspect = command("inspect", help="read compact item or property statements")
     inspect.add_argument("qids", nargs="+", help="QIDs or PIDs")
     inspect.add_argument(
@@ -185,6 +201,28 @@ def main(argv: Sequence[str] | None = None) -> int:
             with args.path.open("x", encoding="utf-8") as output:
                 output.write(json.dumps(SAMPLE, indent=2) + "\n")
             print(f"Created illustrative case: {args.path}")
+        elif args.command == "google-kg":
+            qids, hints = select_qids(args.case, args.qids, args.qids_file, args.max_items)
+            output = args.output or (args.case.parent / "google-kg" if args.case else None)
+            if output is None:
+                raise ValueError("--output is required with --qids or --qids-file")
+            inputs = [path.resolve() for path in (args.case, args.qids_file) if path]
+            if any(
+                path in inputs
+                for path in ((output / "report.json").resolve(), (output / "report.md").resolve())
+            ):
+                raise ValueError("Report outputs must be distinct from input files")
+            backend = args.backend or ("browser" if args.saved_pages else "api")
+            options = ScrapeOptions(
+                output, args.delay, args.headed, args.fresh, args.saved_pages, backend, args.limit
+            )
+            google_report = scrape_google_kg(qids, hints, options)
+            print(f"Wrote {output / 'report.md'} and {output / 'report.json'}")
+            if any(
+                item["status"] in {"blocked", "failed", "not_attempted"}
+                for item in google_report["items"]
+            ):
+                return 2
         elif args.command == "cache":
             cache = IdCache(args.file)
             if args.find is not None:

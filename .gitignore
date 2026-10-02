@@ -19,3 +19,7 @@ build/
 
 # Per-request research and submission artifacts stay local.
 /requests/
+
+# Local credentials.
+/.env
+/.env.*

@@ -7,4 +7,9 @@ export UV_PYTHON_INSTALL_DIR="${UV_PYTHON_INSTALL_DIR:-$repo_root/.uv-python}"
 export PYSTOW_HOME="${PYSTOW_HOME:-$repo_root/.pystow}"
 export WIKIDATA_PILOT_STATE_DIR="${WIKIDATA_PILOT_STATE_DIR:-$repo_root/.wikidata-pilot-state}"
 
-exec uv --project "$repo_root" run wikidata-pilot "$@"
+run_args=(--project "$repo_root" run)
+if [[ -f "$repo_root/.env" ]]; then
+    run_args+=(--env-file "$repo_root/.env")
+fi
+
+exec uv "${run_args[@]}" wikidata-pilot "$@"
