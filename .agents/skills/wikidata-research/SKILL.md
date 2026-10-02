@@ -71,6 +71,14 @@ year, month, or exact day. Resolve uncertain matches before preparing a batch.
 Wait to export relationships to new items until their QIDs are recorded and
 their case decisions are updated to `existing`.
 
+For Google Knowledge Graph ID (P2671, `/g/`) and Freebase ID (P646, `/m/`)
+additions, omit QuickStatements references: the identifier links to the entity
+being identified. Confirm that the linked entity is the correct person or work,
+including work/edition scope. Keep inspected source captures, URLs, retrieval
+dates, excerpts, and identity decisions in the local case for review. The
+exporter omits reference snaks for these two external-ID properties while
+retaining evidence validation and qualifiers. Other claims keep references.
+
 Prepare affected outputs once:
 
 ```sh

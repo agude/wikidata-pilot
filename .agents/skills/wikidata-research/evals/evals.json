@@ -35,6 +35,11 @@
       "id": 7,
       "prompt": "Find works by Keith Laumer and items published in this collection. Check publisher constraints and the WikiProject Books edition guidance. Use fewer tokens than browsing Wikidata pages.",
       "expected_output": "Use local metadata first, linked with the confirmed author QID and P50, linked with the collection QID and P1433, inspect P123 with P2302, and page to select guidance sections. Follow continuation markers instead of treating the first page as exhaustive. Do not browse Wikidata HTML or Special:WhatLinksHere. Inspect candidate identities and use external primary evidence for claims."
+    },
+    {
+      "id": 14,
+      "prompt": "Prepare Google Knowledge Graph P2671 and Freebase P646 identifiers confirmed from saved Google panels. Do we need QS references, and can we skip identity review?",
+      "expected_output": "Omit QuickStatements reference snaks for P2671 and P646 external-ID claims because the identifiers link to the entity. Confirm the correct person or work and work/edition scope. Retain inspected captures, URLs, retrieval dates, excerpts, and claim-to-source links in the local case; do not skip evidence validation. Other properties keep their references."
     }
   ]
 }

@@ -295,10 +295,16 @@ def export_case(case: Case) -> str:
                 else:
                     statement_type = "text"
                     target_value = claim.value
-            for source_id in claim.sources:
+            omit_references = claim.datatype == "external-id" and claim.property in {
+                "P2671",
+                "P646",
+            }
+            for source_index, source_id in enumerate(claim.sources):
                 source = next(src for src in case.sources if src.id == source_id)
                 if source.verification != "verified":
                     raise ValueError(f"Source {source_id} is not verified")
+                if omit_references and source_index > 0:
+                    continue
                 qualifiers: list[EntityQualifier | DateQualifier | TextQualifier] = []
                 for qualifier in claim.qualifiers:
                     if qualifier.datatype == "item":
@@ -321,14 +327,16 @@ def export_case(case: Case) -> str:
                         qualifiers.append(
                             TextQualifier(predicate=qualifier.property, target=qualifier.value)
                         )
-                qualifiers.extend(
-                    [
-                        TextQualifier(predicate="S854", target=str(source.url)),
-                        DateQualifier(
-                            predicate="S813", target=f"+{source.retrieved.isoformat()}T00:00:00Z/11"
-                        ),
-                    ]
-                )
+                if not omit_references:
+                    qualifiers.extend(
+                        [
+                            TextQualifier(predicate="S854", target=str(source.url)),
+                            DateQualifier(
+                                predicate="S813",
+                                target=f"+{source.retrieved.isoformat()}T00:00:00Z/11",
+                            ),
+                        ]
+                    )
                 if statement_type == "item":
                     statement: EntityLine | DateLine | TextLine = EntityLine(
                         subject=target,

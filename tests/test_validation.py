@@ -115,6 +115,42 @@ def test_multiple_sources_keep_distinct_references_and_qualifier_precision() -> 
     assert 'S854|"https://example.org/second"|S813|+2026-09-29T00:00:00Z/11' in output
 
 
+@pytest.mark.parametrize("property_id,value", [("P2671", "/g/11test"), ("P646", "/m/test")])
+def test_google_ids_omit_references_but_require_all_evidence(property_id: str, value: str) -> None:
+    example = case()
+    second_source = source()
+    second_source.id = "second"
+    example.sources.append(second_source)
+    example.entities[0].claims = [
+        Claim(
+            id="google-id",
+            property=property_id,
+            datatype="external-id",
+            value=value,
+            sources=["book", "second"],
+            qualifiers=[Qualifier(property="P1545", datatype="string", value="2")],
+        )
+    ]
+    assert export_case(example) == f'Q1|{property_id}|"{value}"|P1545|"2"\n'
+    second_source.verification = "illustrative_unverified"
+    with pytest.raises(ValueError, match="illustrative_unverified"):
+        export_case(example)
+
+
+def test_other_external_ids_keep_references() -> None:
+    example = case()
+    example.entities[0].claims = [
+        Claim(
+            id="isbn",
+            property="P212",
+            datatype="external-id",
+            value="9781234567890",
+            sources=["book"],
+        )
+    ]
+    assert 'S854|"https://example.org/book"|S813|+2026-09-29T00:00:00Z/11' in export_case(example)
+
+
 @pytest.mark.parametrize("value", ['Quote "', "Pipe |", "newline\nCREATE", "tab\tCREATE"])
 def test_unsafe_text_cannot_inject_commands(value: str) -> None:
     example = case()

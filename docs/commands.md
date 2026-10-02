@@ -252,6 +252,10 @@ a new numbered batch path for later exports.
 live records. Relationships to new items remain deferred until returned QIDs
 are recorded. It does not submit, remove, or move Wikidata statements.
 
+P2671 and P646 external-ID claims are exported without reference snaks because
+the identifiers link to the entity. Keep verified evidence and identity
+decisions in the case; evidence validation and qualifiers still apply.
+
 ## cache
 
 `cache --find "NAME"` returns all exact, case-insensitive local label and alias
