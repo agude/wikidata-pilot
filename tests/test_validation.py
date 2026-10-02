@@ -61,6 +61,31 @@ def test_invalid_decisions_and_identifier_properties_are_rejected() -> None:
         )
 
 
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"datatype": "time", "value": "2025", "precision": None},
+        {"datatype": "string", "value": "text", "language": "en"},
+        {"datatype": "string", "value": "text", "precision": "year"},
+        {"datatype": "monolingualtext", "value": "text", "language": None},
+        {"datatype": "monolingualtext", "value": "text", "language": "bad_tag!"},
+        {"datatype": "item", "value": "Q0"},
+        {"datatype": "url", "value": "not a URL"},
+    ],
+)
+def test_claim_rejects_invalid_datatype_fields(overrides: dict[str, object]) -> None:
+    claim_data: dict[str, object] = {
+        "id": "claim",
+        "property": "P1476",
+        "datatype": "string",
+        "value": "text",
+        "sources": ["book"],
+    }
+    claim_data.update(overrides)
+    with pytest.raises(ValidationError):
+        Claim.model_validate(claim_data)
+
+
 def test_unknown_local_targets_block_export() -> None:
     example = case()
     example.entities[0].claims[0].value = "missing-target"
@@ -151,15 +176,26 @@ def test_other_external_ids_keep_references() -> None:
     assert 'S854|"https://example.org/book"|S813|+2026-09-29T00:00:00Z/11' in export_case(example)
 
 
+@pytest.mark.parametrize("field", ["label", "description", "claim", "qualifier"])
 @pytest.mark.parametrize("value", ['Quote "', "Pipe |", "newline\nCREATE", "tab\tCREATE"])
-def test_unsafe_text_cannot_inject_commands(value: str) -> None:
+def test_unsafe_text_cannot_inject_commands(field: str, value: str) -> None:
     example = case()
-    example.entities[0].label = value
+    if field in {"label", "description"}:
+        setattr(example.entities[0], field, value)
+    else:
+        claim = example.entities[0].claims[0]
+        claim.datatype = "string"
+        claim.property = "P1476"
+        claim.value = "safe"
+        if field == "claim":
+            claim.value = value
+        else:
+            claim.qualifiers = [Qualifier(property="P1545", datatype="string", value=value)]
     with pytest.raises(ValueError, match="unsafe"):
         export_case(example)
 
 
-def test_duplicate_source_and_claim_ids_are_rejected() -> None:
+def test_duplicate_case_keys_and_ids_are_rejected() -> None:
     example = case().model_dump(mode="json")
     example["sources"] *= 2
     with pytest.raises(ValidationError, match="source IDs"):
@@ -167,6 +203,10 @@ def test_duplicate_source_and_claim_ids_are_rejected() -> None:
     example = case().model_dump(mode="json")
     example["entities"][0]["claims"] *= 2
     with pytest.raises(ValidationError, match="claim IDs"):
+        Case.model_validate(example)
+    example = case().model_dump(mode="json")
+    example["entities"].append(example["entities"][0])
+    with pytest.raises(ValidationError, match="entity keys"):
         Case.model_validate(example)
 
 

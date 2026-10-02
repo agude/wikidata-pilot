@@ -122,7 +122,7 @@ def plan_qid_import(
         entity.key
         for label in creation_labels
         if label not in report_labels
-        for entity in entities_by_label[label]
+        for entity in entities_by_label.get(label, [])
         if entity.resolution.status == "create"
     )
     return QidImportPlan(

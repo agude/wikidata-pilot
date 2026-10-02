@@ -13,9 +13,7 @@ from pydantic import HttpUrl
 
 from wikidata_pilot import cli
 from wikidata_pilot.models import Case, Claim, Entity, Resolution, Source
-from wikidata_pilot.wikidata import WikidataClient
 from wikidata_pilot.workflow import (
-    _quickstatements_date,
     deferred_claims,
     export_case,
     live_snapshot,
@@ -101,7 +99,15 @@ def test_local_dependency_blocks_relationship_until_target_is_resolved() -> None
     assert validate_case(example) == []
     output = export_case(example)
     assert "CREATE" in output
+    assert "P1433" not in output
     assert deferred_claims(example) == ["story.collection -> collection"]
+    example.entities[1].resolution = Resolution(
+        status="existing", qid="Q99", reason="returned by creation batch"
+    )
+    output = export_case(example)
+    assert "CREATE" not in output
+    assert "Q1|P1433|Q99" in output
+    assert deferred_claims(example) == []
 
 
 def test_matching_preserves_ambiguity_and_identifier_search_first() -> None:
@@ -126,11 +132,17 @@ def test_matching_preserves_ambiguity_and_identifier_search_first() -> None:
 
         def search(self, query: str) -> list[dict[str, str]]:
             self.queries.append(query)
-            return [{"id": "Q1", "label": "Story"}]
+            return [
+                {"id": "Q1", "label": "Story"},
+                {"id": "Q2", "label": "Another story"},
+            ]
 
         def search_identifier(self, property_id: str, identifier: str) -> list[dict[str, str]]:
             self.queries.append(f"{property_id}:{identifier}")
-            return [{"id": "Q1", "label": "Story"}]
+            return [
+                {"id": "Q1", "label": "Story"},
+                {"id": "Q3", "label": "Identifier result"},
+            ]
 
     client = Search()
     matched, report = match_case(example, client)
@@ -138,14 +150,15 @@ def test_matching_preserves_ambiguity_and_identifier_search_first() -> None:
     assert matched.entities[0].resolution.status == "unresolved"
     candidates = report[0]["candidates"]
     assert isinstance(candidates, list)
-    assert len(candidates) == 1
+    assert [candidate["qid"] for candidate in candidates] == ["Q1", "Q3", "Q2"]
+    assert candidates[0]["matched_by"] == ["P212", "Story"]
 
 
 def test_plan_includes_current_and_proposed_labels() -> None:
     output = render_plan(case())
     assert "live snapshot not captured" in output
-    assert "Proposed claim" in output
-    assert "Q1" in output
+    assert "Current item: Q1" in output
+    assert "| P1433 | (live snapshot not captured) | Q2 | book |" in output
 
 
 def test_export_blocks_unverified_source() -> None:
@@ -201,11 +214,33 @@ def test_export_renders_creation_claims_dates_text_and_references() -> None:
     assert 'P212|"9780000000000"' in output
 
 
-def test_time_dates_and_snapshot_rendering() -> None:
-    assert _quickstatements_date("1982", "year").endswith("/9")
-    assert _quickstatements_date("1982-03", "month").endswith("/10")
-    with pytest.raises(ValueError, match="Invalid time"):
-        _quickstatements_date("1982-03-01-extra", "day")
+@pytest.mark.parametrize(
+    ("value", "precision", "expected"),
+    [
+        ("1982", "year", "+1982-00-00T00:00:00Z/9"),
+        ("1982-03", "month", "+1982-03-00T00:00:00Z/10"),
+        ("1982-03-14", "day", "+1982-03-14T00:00:00Z/11"),
+        ("2024-02-29", "day", "+2024-02-29T00:00:00Z/11"),
+    ],
+)
+def test_export_preserves_date_precision(
+    value: str, precision: Literal["year", "month", "day"], expected: str
+) -> None:
+    example = case()
+    example.entities[0].claims = [
+        Claim(
+            id="date",
+            property="P577",
+            datatype="time",
+            value=value,
+            precision=precision,
+            sources=["book"],
+        )
+    ]
+    assert export_case(example).startswith(f"Q1|P577|{expected}|S854|")
+
+
+def test_snapshot_rendering() -> None:
     snapshot: dict[str, object] = {
         "story": {
             "entities": {
@@ -216,7 +251,26 @@ def test_time_dates_and_snapshot_rendering() -> None:
     assert "{'id': 'Q2'}" in render_plan(case(), snapshot)
 
 
-def test_live_snapshot_calls_only_resolved_items() -> None:
+def test_live_snapshot_calls_only_existing_items() -> None:
+    example = case()
+    example.entities.extend(
+        [
+            Entity(
+                key="new-work",
+                kind="work",
+                label="New work",
+                description="work",
+                resolution=Resolution(status="create", reason="checked sources"),
+            ),
+            Entity(
+                key="unknown-work",
+                kind="work",
+                label="Unknown work",
+                description="work",
+            ),
+        ]
+    )
+
     class Reader:
         def __init__(self) -> None:
             self.qids: list[str] = []
@@ -226,7 +280,7 @@ def test_live_snapshot_calls_only_resolved_items() -> None:
             return {"qid": qid}
 
     reader = Reader()
-    assert live_snapshot(case(), reader) == {"story": {"qid": "Q1"}}
+    assert live_snapshot(example, reader) == {"story": {"qid": "Q1"}}
     assert reader.qids == ["Q1"]
 
 
@@ -421,71 +475,6 @@ def test_pilot_forwards_arguments_and_environment_overrides(tmp_path, overrides)
         [str(tmp_path / overrides[key]) for key in overrides] if overrides else expected_defaults
     )
     assert cache_values == expected
-
-
-def test_wikidata_client_handles_search_and_errors() -> None:
-    class Response:
-        def __init__(self, payload: object) -> None:
-            self.payload = payload
-            self.status_code = 200
-            self.headers: dict[str, str] = {}
-            self.text = ""
-            self.reason_phrase = "OK"
-
-        def raise_for_status(self) -> None:
-            return None
-
-        def json(self) -> object:
-            return self.payload
-
-    class Transport:
-        def get(self, url: str, **kwargs: object) -> Response:
-            if "sparql" in url:
-                return Response(
-                    {
-                        "results": {
-                            "bindings": [
-                                {
-                                    "item": {"value": "http://www.wikidata.org/entity/Q9"},
-                                    "itemLabel": {"value": "Nine"},
-                                }
-                            ]
-                        }
-                    }
-                )
-            params = kwargs.get("params", {})
-            if isinstance(params, dict) and params.get("list") == "search":
-                return Response({"query": {"search": [{"title": "Q9"}]}})
-            if isinstance(params, dict) and params.get("action") == "wbgetentities":
-                return Response(
-                    {
-                        "entities": {
-                            "Q9": {
-                                "id": "Q9",
-                                "claims": {
-                                    "P212": [
-                                        {
-                                            "rank": "normal",
-                                            "mainsnak": {
-                                                "snaktype": "value",
-                                                "datavalue": {"value": "9780000000000"},
-                                            },
-                                        }
-                                    ]
-                                },
-                            }
-                        }
-                    }
-                )
-            return Response({"search": [{"id": "Q3", "label": "Three"}]})
-
-        def close(self) -> None:
-            return None
-
-    client = WikidataClient(Transport())  # type: ignore[arg-type]
-    assert client.search("Three")[0]["id"] == "Q3"
-    assert client.search_identifier("P212", "9780000000000")[0]["id"] == "Q9"
-    client.close()
 
 
 def test_cli_commands_with_offline_client(

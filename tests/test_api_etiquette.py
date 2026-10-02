@@ -150,10 +150,14 @@ def test_retry_budget_saves_long_cooldown_without_sleep(tmp_path):
     assert json.loads((tmp_path / "action.json").read_text())["cooldown_until"] == clock.now + 180
 
 
-@pytest.mark.parametrize("payload", [{"error": {"code": "maxlag", "lag": 5}}])
-def test_http_200_maxlag_is_retried(tmp_path, payload):
+def test_http_200_maxlag_is_retried(tmp_path):
     clock = MockClock()
-    responses = iter([httpx.Response(200, json=payload), httpx.Response(200, json={"ok": True})])
+    responses = iter(
+        [
+            httpx.Response(200, json={"error": {"code": "maxlag", "lag": 5}}),
+            httpx.Response(200, json={"ok": True}),
+        ]
+    )
     http = httpx.Client(transport=httpx.MockTransport(lambda _: next(responses)))
     result = request_json(
         http,
@@ -166,6 +170,132 @@ def test_http_200_maxlag_is_retried(tmp_path, payload):
     )
     assert result == {"ok": True}
     assert clock.sleeps == [5.0]
+
+
+@pytest.mark.parametrize(
+    "saved_value",
+    ["not json", '{"cooldown_until": NaN}', '{"cooldown_until": Infinity}'],
+)
+def test_malformed_or_nonfinite_saved_cooldown_is_ignored(tmp_path, saved_value):
+    clock = MockClock()
+    (tmp_path / "action.json").write_text(saved_value, encoding="utf-8")
+    calls = 0
+
+    def respond(_):
+        nonlocal calls
+        calls += 1
+        return httpx.Response(200, json={"ok": True})
+
+    with httpx.Client(transport=httpx.MockTransport(respond)) as http:
+        assert request_json(
+            http,
+            API,
+            params={},
+            state_dir=tmp_path,
+            clock=clock.time,
+            sleep=clock.sleep,
+        ) == {"ok": True}
+    assert calls == 1
+    assert clock.sleeps == []
+
+
+@pytest.mark.parametrize("retry_after", ["tomorrow", "NaN", "Infinity"])
+def test_malformed_retry_after_uses_backoff_fallback(tmp_path, retry_after):
+    clock = MockClock()
+    responses = iter(
+        [
+            httpx.Response(429, headers={"Retry-After": retry_after}),
+            httpx.Response(200, json={"ok": True}),
+        ]
+    )
+    with httpx.Client(transport=httpx.MockTransport(lambda _: next(responses))) as http:
+        assert request_json(
+            http,
+            API,
+            params={},
+            state_dir=tmp_path,
+            clock=clock.time,
+            sleep=clock.sleep,
+            jitter=lambda *_: 0.0,
+        ) == {"ok": True}
+    assert clock.sleeps == [5.0]
+
+
+@pytest.mark.parametrize(
+    ("cooldown_endpoint", "request_endpoint", "expected_host"),
+    [
+        (API, "https://query.wikidata.org/sparql", "query.wikidata.org"),
+        ("https://query.wikidata.org/sparql", API, "www.wikidata.org"),
+    ],
+)
+def test_endpoint_cooldowns_are_independent(
+    tmp_path, cooldown_endpoint, request_endpoint, expected_host
+):
+    clock = MockClock()
+    endpoint_key = "action" if cooldown_endpoint == API else "sparql"
+    (tmp_path / f"{endpoint_key}.json").write_text(
+        json.dumps({"cooldown_until": clock.now + 180}), encoding="utf-8"
+    )
+    calls = []
+
+    def respond(request):
+        calls.append(request.url.host)
+        return httpx.Response(200, json={"ok": True})
+
+    with httpx.Client(transport=httpx.MockTransport(respond)) as http:
+        assert request_json(
+            http,
+            request_endpoint,
+            params={},
+            state_dir=tmp_path,
+            clock=clock.time,
+            sleep=clock.sleep,
+        ) == {"ok": True}
+        assert calls == [expected_host]
+        with pytest.raises(RetryBudgetExceeded, match="cooldown exceeds the remaining wait budget"):
+            request_json(
+                http,
+                cooldown_endpoint,
+                params={},
+                state_dir=tmp_path,
+                clock=clock.time,
+                sleep=clock.sleep,
+            )
+    assert calls == [expected_host]
+    assert clock.sleeps == []
+
+
+def test_lock_timeout_skips_network_and_allows_later_request(tmp_path):
+    clock = MockClock()
+    calls = []
+
+    def respond(request):
+        calls.append(request)
+        return httpx.Response(200, json={"ok": True})
+
+    with (tmp_path / "action.lock").open("a+b") as lock_file:
+        fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+        with httpx.Client(transport=httpx.MockTransport(respond)) as http:
+            with pytest.raises(RetryBudgetExceeded, match="Timed out waiting"):
+                request_json(
+                    http,
+                    API,
+                    params={},
+                    state_dir=tmp_path,
+                    clock=clock.time,
+                    sleep=clock.sleep,
+                )
+            assert calls == []
+            fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+            assert request_json(
+                http,
+                API,
+                params={},
+                state_dir=tmp_path,
+                clock=clock.time,
+                sleep=clock.sleep,
+            ) == {"ok": True}
+    assert len(calls) == 1
 
 
 def test_unclassified_503_is_not_retried(tmp_path):
