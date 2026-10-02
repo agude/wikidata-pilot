@@ -12,6 +12,7 @@ import httpx
 from pydantic import ValidationError
 
 from .cache import DEFAULT_CACHE, IdCache, case_ids
+from .execution import apply_qid_import, plan_qid_import, render_qid_import_plan
 from .google_kg import ScrapeOptions, scrape_google_kg, select_qids
 from .inspection import summarize_entity
 from .models import load_case, save_case
@@ -167,6 +168,22 @@ def parser() -> argparse.ArgumentParser:
     history.add_argument("--cursor")
     match = command("match", help="search unresolved entities and save candidates")
     match.add_argument("case", type=Path)
+    record_qids = command(
+        "record-qids", help="preview or record QIDs from a QuickStatements creation report"
+    )
+    record_qids.add_argument("case", type=Path)
+    record_qids.add_argument("report", type=Path, help="saved Wikidata creation result lines")
+    record_qids.add_argument(
+        "--batch", type=Path, required=True, help="submitted QS file used to confirm item labels"
+    )
+    record_qids.add_argument(
+        "--apply", action="store_true", help="write the matched QIDs into the case file"
+    )
+    record_qids.add_argument(
+        "--partial",
+        action="store_true",
+        help="skip report items not represented in the case",
+    )
     validate = command("validate", help="validate evidence and resolution decisions")
     validate.add_argument("case", type=Path)
     plan = command("plan", help="write before/after proposal review files")
@@ -343,6 +360,29 @@ def main(argv: Sequence[str] | None = None) -> int:
                 case, report = match_case(case, client)
             save_case(args.case, case)
             print(json.dumps(report, indent=2, ensure_ascii=False))
+        elif args.command == "record-qids":
+            case_path = args.case.resolve()
+            report_path = args.report.resolve()
+            batch_path = args.batch.resolve()
+            if len({case_path, report_path, batch_path}) != 3:
+                raise ValueError("Case, report, and submitted QS paths must all be distinct")
+            case = load_case(args.case)
+            plan = plan_qid_import(
+                case,
+                args.report.read_text(encoding="utf-8"),
+                args.batch.read_text(encoding="utf-8"),
+                allow_unrepresented=args.partial,
+            )
+            print(render_qid_import_plan(case, plan))
+            if args.apply:
+                updated_count = apply_qid_import(case, plan, args.report.name)
+                if updated_count:
+                    save_case(args.case, case)
+                    print(f"Recorded {updated_count} QID(s) in {args.case}")
+                else:
+                    print("No case changes needed; all returned QIDs were already recorded.")
+            else:
+                print("Preview only; pass --apply to update the case.")
         elif args.command == "validate":
             errors = validate_case(load_case(args.case))
             if errors:

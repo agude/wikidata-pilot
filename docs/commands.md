@@ -336,6 +336,23 @@ It checks exact identifiers before title and author candidates. It does not
 resolve ambiguous identity or prove absence. Review candidates before recording
 `existing`, `create`, or `unresolved` decisions.
 
+## record-qids
+
+`record-qids CASE REPORT --batch PATH.qs` previews QID assignments from saved
+Wikidata item-creation history lines. It accepts lines that identify a new item
+by label and QID and include a QuickStatements 3.0 batch number. It verifies
+that each label appears exactly once in both the submitted QS file's `CREATE`
+commands and the case. Unknown labels, duplicate labels, conflicting QIDs, and
+reports containing multiple batches stop the command.
+
+Preview is the default. Review the mapping, then add `--apply` to update matched
+case entities to `existing`. Existing matching QIDs are left unchanged;
+creation results absent from the report remain marked `create`. The command
+does not make network requests or submit edits. Use `--partial` to apply a
+full-batch report to a case containing only some of its entities. Out-of-case
+results must still match a `CREATE` label in the supplied QS file and are shown
+as skipped; ambiguous case labels remain errors.
+
 ## validate
 
 `validate CASE` checks structure, evidence links, and resolution decisions.

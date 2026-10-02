@@ -135,7 +135,29 @@ The CLI defaults to `data/wikidata_ids.json`. The runner uses writable repositor
 
 ## Staged creation
 
-When a case contains several new entities that refer to one another, export creates each new entity’s label, description, and claims whose targets already resolve. Relationship claims to another new entity are listed as deferred. Submit the first `.qs` batch manually, copy each returned QID into that entity’s resolution as `existing` with a reason, then run validation, planning, and export again. The resolved QID is reused; the tool does not create that entity again. Review each generated batch before submitting it.
+When a case contains several new entities that refer to one another, export creates each new entity’s label, description, and claims whose targets already resolve. Relationship claims to another new entity are listed as deferred. Submit the first `.qs` batch manually and save the Wikidata creation result lines. Preview the returned-QID mapping, then apply it to the case:
+
+```sh
+just pilot record-qids requests/REQUEST/case.json \
+  requests/REQUEST/batches/001-execution-report.txt \
+  --batch requests/REQUEST/batches/001-create.qs
+just pilot record-qids requests/REQUEST/case.json \
+  requests/REQUEST/batches/001-execution-report.txt \
+  --batch requests/REQUEST/batches/001-create.qs --apply
+```
+
+The report must contain Wikidata item-creation history lines from one
+QuickStatements 3.0 batch. The importer matches labels exactly against `CREATE`
+commands in the submitted QS file and the case. It refuses ambiguous, unknown,
+or conflicting matches. Preview is the default; `--apply` updates only matched
+entities, and unreturned items remain marked `create`. Then run validation,
+planning, and export again. The resolved QID is reused; the tool does not
+create that entity again. Review each generated batch before submitting it.
+
+Use `--partial` when applying a full batch report to a case that intentionally
+contains only some of that batch's entities. The importer still verifies every
+reported label against the submitted QS file, shows out-of-case results as
+skipped, and refuses ambiguous labels.
 
 `quickstatements-client` builds QuickStatements lines locally. The tool does not call its submission API. Keep backups of case files and review generated files as proposals, not completed edits.
 
