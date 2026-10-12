@@ -19,7 +19,7 @@ from . import __version__
 from .api_transport import request_json, state_directory
 
 API = "https://www.wikidata.org/w/api.php"
-SPARQL = "https://query.wikidata.org/sparql"
+SPARQL = "https://query-next.wikidata.org/sparql"
 CANDIDATE_TTL_SECONDS = 300
 MAX_CANDIDATE_CACHE_ENTRIES = 128
 
@@ -224,12 +224,7 @@ class WikidataClient:
         _validate_page(limit, offset)
         if not re.fullmatch(r"Q[1-9][0-9]*", qid) or not re.fullmatch(r"P[1-9][0-9]*", property_id):
             raise ValueError("Expected a target QID and relationship PID")
-        query = (
-            "SELECT DISTINCT ?item ?itemLabel ?itemDescription WHERE { "
-            f"?item wdt:{property_id} wd:{qid}. "
-            "SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. } "
-            f"}} ORDER BY ?item LIMIT {limit + 1} OFFSET {offset}"
-        )
+        query = _item_select(f"?item wdt:{property_id} wd:{qid}.", limit, offset)
         return self._item_query(query, limit, offset, fresh=fresh)
 
     def identifier(
@@ -250,12 +245,7 @@ class WikidataClient:
                 raise ValueError(
                     f"{property_id} requires an item QID for exact relationship lookup"
                 )
-            query = (
-                "SELECT DISTINCT ?item ?itemLabel ?itemDescription WHERE { "
-                f"?item wdt:{property_id} wd:{value}. "
-                "SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. } "
-                f"}} ORDER BY ?item LIMIT {limit + 1} OFFSET {offset}"
-            )
+            query = _item_select(f"?item wdt:{property_id} wd:{value}.", limit, offset)
             return self._item_query(query, limit, offset, fresh=fresh)
         search_value = value.replace("\\", "\\\\").replace('"', '\\"')
         params = {
@@ -419,12 +409,7 @@ class WikidataClient:
         if not re.fullmatch(r"Q[1-9][0-9]*", qid):
             raise ValueError("Expected a class or instance QID")
         path = "wdt:P31/wdt:P279*" if instance_of else "wdt:P279+"
-        query = (
-            "SELECT DISTINCT ?item ?itemLabel ?itemDescription WHERE { "
-            f"wd:{qid} {path} ?item. FILTER(?item != wd:{qid}) "
-            "SERVICE wikibase:label { bd:serviceParam wikibase:language 'en'. } "
-            f"}} ORDER BY ?item LIMIT {limit + 1} OFFSET {offset}"
-        )
+        query = _item_select(f"wd:{qid} {path} ?item. FILTER(?item != wd:{qid})", limit, offset)
         return self._item_query(query, limit, offset, fresh=fresh)
 
     def _item_query(
@@ -645,6 +630,25 @@ def _statement_string(statement: Any) -> str | None:
     if isinstance(value, str):
         return value
     return None
+
+
+def _item_select(pattern: str, limit: int, offset: int) -> str:
+    """Build a SPARQL 1.1 item query that reads English names directly.
+
+    The QLever query backend has no Blazegraph label service and does not
+    guarantee Blazegraph's predefined prefixes.
+    """
+    return (
+        "PREFIX wd: <http://www.wikidata.org/entity/> "
+        "PREFIX wdt: <http://www.wikidata.org/prop/direct/> "
+        "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
+        "PREFIX schema: <http://schema.org/> "
+        f"SELECT DISTINCT ?item ?itemLabel ?itemDescription WHERE {{ {pattern} "
+        "OPTIONAL { ?item rdfs:label ?itemLabel. FILTER(LANG(?itemLabel) = 'en') } "
+        "OPTIONAL { ?item schema:description ?itemDescription. "
+        "FILTER(LANG(?itemDescription) = 'en') } "
+        f"}} ORDER BY ?item LIMIT {limit + 1} OFFSET {offset}"
+    )
 
 
 def _validate_page(limit: int, offset: int) -> None:

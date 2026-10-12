@@ -15,7 +15,7 @@ import httpx
 import pytest
 
 from wikidata_pilot.api_transport import RetryBudgetExceeded, request_json
-from wikidata_pilot.wikidata import API, WikidataClient
+from wikidata_pilot.wikidata import API, SPARQL, WikidataClient
 
 
 class MockClock:
@@ -224,8 +224,8 @@ def test_malformed_retry_after_uses_backoff_fallback(tmp_path, retry_after):
 @pytest.mark.parametrize(
     ("cooldown_endpoint", "request_endpoint", "expected_host"),
     [
-        (API, "https://query.wikidata.org/sparql", "query.wikidata.org"),
-        ("https://query.wikidata.org/sparql", API, "www.wikidata.org"),
+        (API, SPARQL, "query-next.wikidata.org"),
+        (SPARQL, API, "www.wikidata.org"),
     ],
 )
 def test_endpoint_cooldowns_are_independent(

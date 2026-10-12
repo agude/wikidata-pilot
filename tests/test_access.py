@@ -137,7 +137,11 @@ def test_search_type_continuation_and_invalid_parameters():
 def test_linked_uses_property_query_and_has_more():
     def response(request):
         query = request.url.params["query"]
+        assert request.url.host == "query-next.wikidata.org"
         assert "wdt:P1433 wd:Q1" in query
+        assert "PREFIX wdt: <http://www.wikidata.org/prop/direct/>" in query
+        assert "?item rdfs:label ?itemLabel. FILTER(LANG(?itemLabel) = 'en')" in query
+        assert "wikibase:label" not in query
         assert "ORDER BY ?item LIMIT 3 OFFSET 2" in query
         return httpx.Response(
             200,

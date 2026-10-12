@@ -89,7 +89,9 @@ Relationship SPARQL commands (`linked`, `ancestors`, and `identifier` for
 P1433/P2860) use best-ranked direct statements: deprecated statements are
 excluded, and preferred statements suppress normal statements for that
 property. Results are sorted by entity URI, not relevance or hierarchy depth.
-The query service and Action API search index can lag edits. Empty results do
+These commands query the QLever-based v2 endpoint,
+`query-next.wikidata.org`, with standard SPARQL 1.1. Items without an English
+label or description return empty strings for those fields. The query service and Action API search index can lag edits. Empty results do
 not prove absence. Inspect candidate records before deciding identity;
 Wikidata statements do not replace source evidence.
 
@@ -419,6 +421,8 @@ identity or verify a proposed claim. No command submits edits to Wikidata.
   `haswbstatement` syntax, case behavior, and excluded properties.
 - [WDQS query limits](https://www.mediawiki.org/wiki/Wikidata_query_service/User_Manual#Query_limits):
   limits for relationship and hierarchy queries.
+- [WDQS v2 migration](https://www.wikidata.org/wiki/Wikidata:SPARQL_query_service/WDQS_backend_update/Migrate):
+  v2 endpoints, label-service replacement, and SPARQL 1.1 requirements.
 - [Wikibase API](https://www.mediawiki.org/wiki/Wikibase/API): entities, names,
   and sitelink resolution.
 - [SPARQL tutorial](https://www.wikidata.org/wiki/Wikidata:SPARQL_tutorial):
