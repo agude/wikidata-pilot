@@ -122,6 +122,32 @@ Agent summaries and search snippets alone are not verified evidence.
    project guidance for unfamiliar relationships or conflicting rules; reuse
    local guidance for covered cases. Metadata is not claim evidence.
 
+### Numbered book-series relationships
+
+For a numbered book series, model the relationship in both directions when
+the series item and work items are in scope:
+
+- On each book, use `P179` (part of the series) with `P1545` (series ordinal)
+  and, when supported, `P155`/`P156` (previous/next) as qualifiers.
+- On the series, use `P527` (has part(s)) with the same ordinal and
+  previous/next qualifiers.
+- Inspect both `P179` and `P527` before export. A generic `P361` (part of)
+  statement that duplicates the book's `P179` series membership is redundant;
+  do not add it. Remove an existing redundant `P361` only in a separate,
+  reviewed cleanup batch.
+
+The normal case exporter is additive and does not generate deletions. For a
+targeted cleanup, use QuickStatements 3.0's statement-ID syntax manually:
+
+```text
+-STATEMENT|Q123$statement-guid
+```
+
+This removes the entire identified statement, including its qualifiers and
+references. Prefer the statement ID over `-Q123|P361|Q456` when the item could
+contain more than one matching statement. Record the inspected statement IDs
+and verify the item again after manual submission.
+
 ## Record and review
 
 Keep the case, source downloads, and outputs under the ignored

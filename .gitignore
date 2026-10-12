@@ -23,3 +23,6 @@ build/
 # Local credentials.
 /.env
 /.env.*
+
+# LLM Files
+.claude
