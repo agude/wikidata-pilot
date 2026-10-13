@@ -61,6 +61,16 @@
     "datatype": "external-id",
     "retrieved": "2026-09-30"
   },
+  "P1235": {
+    "label": "ISFDB series ID",
+    "description": "identifier for a series, periodical or franchise in the Internet Speculative Fiction Database",
+    "aliases": [
+      "Internet Speculative Fiction Database series ID",
+      "The Internet Speculative Fiction Database series ID"
+    ],
+    "datatype": "external-id",
+    "retrieved": "2026-10-12"
+  },
   "P136": {
     "label": "genre",
     "description": "creative work's genre or an artist's field of work (P101). Use main subject (P921) to relate creative works to their topic",
@@ -1059,6 +1069,13 @@
     "datatype": null,
     "retrieved": "2026-09-29"
   },
+  "Q126740660": {
+    "label": "Sunflower Cycle",
+    "description": "",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-12"
+  },
   "Q1279564": {
     "label": "short story collection",
     "description": "book containing several short stories by a single author",
@@ -1361,6 +1378,20 @@
     "aliases": [],
     "datatype": null,
     "retrieved": "2026-09-29"
+  },
+  "Q140810020": {
+    "label": "Giants",
+    "description": "novelette by Peter Watts",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-12"
+  },
+  "Q140810021": {
+    "label": "Hotshot",
+    "description": "novelette by Peter Watts",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-12"
   },
   "Q141600939": {
     "label": "Rogue Bolo",
@@ -2028,6 +2059,13 @@
     "datatype": null,
     "retrieved": "2026-09-30"
   },
+  "Q27916566": {
+    "label": "The Island",
+    "description": "2009 novelette by Peter Watts",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-12"
+  },
   "Q2881141": {
     "label": "",
     "description": "American book publisher",
@@ -2397,6 +2435,13 @@
     "aliases": [],
     "datatype": null,
     "retrieved": "2026-09-30"
+  },
+  "Q62604562": {
+    "label": "The Freeze-Frame Revolution",
+    "description": "2018 novel by Peter Watts",
+    "aliases": [],
+    "datatype": null,
+    "retrieved": "2026-10-12"
   },
   "Q6490202": {
     "label": "Larry Dixon",
